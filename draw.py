@@ -1,9 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 from pprint import pprint
 
-# import shlex
-import sys
-# from enum import Enum
+
+
 
 font_size = 40
 font = ImageFont.truetype('FreeMono.ttf', font_size)
@@ -62,81 +61,3 @@ class TextDraw:
         
 
 
-class Test:
-    def TextDrawMath ():
-        h = "Hello"
-        td = TextDraw(h)
-        td.display()
-        print(20 * '---')
-
-        lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
-
-        coord = (100, 50)
-
-
-        W, H = 1000, 1000
-        i = Image.new("RGBA",(W,H),"white") # random
-
-
-
-        for line in lines:
-            td = TextDraw(line)
-            td.display()
-            print('Coord:')
-            print(coord)
-            print('Top left:')
-            print(td.get_top_left(coord))
-            print('Below:')
-            print(td.get_coord_below(coord))
-
-            print('After drawing:')
-            pprint(td.draw(i, coord))
-            print(20 * '---')
-            
-
-        TextDraw('\n'.join(lines))
-
-    def TextDrawMultiline ():
-        W, H = 2500, 1000
-        i = Image.new("RGBA",(W,H),"white") # random
-        lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
-        
-        s = '\n'.join(lines)
-        coord = (W/2, 50)
-        td = TextDraw(s)
-        new_coord = td.draw(i, coord)
-        i.show()
-        pprint(new_coord)
-
-    def TextDrawSeparateLines ():
-        W, H = 2500, 1000
-        i = Image.new("RGBA",(W,H),"white") # random
-        lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
-        
-#        s = '\n'.join(lines)
-        coord = (W/2, 50)
-
-        for line in lines:
-            td = TextDraw(line)
-            coord = td.draw(i, coord)
-            pprint(coord)
-
-        i.show()
-
-
-
-
-
-
-def main() -> int:
-    Test.TextDrawMath()
-    # Test.TextDrawMultiline()
-    Test.TextDrawSeparateLines()
-
-
-    return 0
-
-
-
-if __name__ == '__main__':
-    sys.exit(main())  # next section explains the use of sys.exit
