@@ -5,7 +5,7 @@ from pprint import pprint
 import sys
 # from enum import Enum
 
-font_size = 32
+font_size = 40
 font = ImageFont.truetype('FreeMono.ttf', font_size)
 margin = 50
 fill_color = (0, 0, 0)
@@ -27,34 +27,113 @@ class TextDraw:
         i = Image.new("RGBA",(W,H),"white") # random
         d = ImageDraw.Draw(i)
 
-        (w, h) = d.textsize(text)
+        (w, h) = d.textsize(text, font = font)
 
         self.size = (w, h)
 
 
-    def display (self):
-        pprint(self.text)
-        pprint(self.size)
-    
+    def get_top_left (self, coord):
+        x, y = coord
+        w, h = self.size
+        return (x - 0.5 * w, y)
 
+
+    def get_coord_below (self, coord):
+        x, y = coord
+        w, h = self.size
+        return (x, y + h) # (x, y + 0.5 * h)
+
+
+    def display (self):
+        print("'" + self.text + "'" + " has size:")
+        pprint(self.size)
+ 
+
+  
+    def draw (self, image, coord):
+        top_left = self.get_top_left(coord)
+
+        d = ImageDraw.Draw(image)
+
+        d.text(top_left, self.text, font = font, fill = fill_color)
+
+
+        return self.get_coord_below(coord)
+        
 
 
 class Test:
-    def TextDraw ():
+    def TextDrawMath ():
         h = "Hello"
         td = TextDraw(h)
         td.display()
+        print(20 * '---')
 
         lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
 
-        for line in lines:
-            TextDraw(line).display()
+        coord = (100, 50)
 
-        TextDraw('\n'.join(lines)).display()
+
+        W, H = 1000, 1000
+        i = Image.new("RGBA",(W,H),"white") # random
+
+
+
+        for line in lines:
+            td = TextDraw(line)
+            td.display()
+            print('Coord:')
+            print(coord)
+            print('Top left:')
+            print(td.get_top_left(coord))
+            print('Below:')
+            print(td.get_coord_below(coord))
+
+            print('After drawing:')
+            pprint(td.draw(i, coord))
+            print(20 * '---')
+            
+
+        TextDraw('\n'.join(lines))
+
+    def TextDrawMultiline ():
+        W, H = 2500, 1000
+        i = Image.new("RGBA",(W,H),"white") # random
+        lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
+        
+        s = '\n'.join(lines)
+        coord = (W/2, 50)
+        td = TextDraw(s)
+        new_coord = td.draw(i, coord)
+        i.show()
+        pprint(new_coord)
+
+    def TextDrawSeparateLines ():
+        W, H = 2500, 1000
+        i = Image.new("RGBA",(W,H),"white") # random
+        lines = ["Yes", "Indeed", "This is a big long sentence which is very big and which is also very long"]
+        
+#        s = '\n'.join(lines)
+        coord = (W/2, 50)
+
+        for line in lines:
+            td = TextDraw(line)
+            coord = td.draw(i, coord)
+            pprint(coord)
+
+        i.show()
+
+
+
+
 
 
 def main() -> int:
-    Test.TextDraw()
+    Test.TextDrawMath()
+    # Test.TextDrawMultiline()
+    Test.TextDrawSeparateLines()
+
+
     return 0
 
 
