@@ -197,18 +197,6 @@ def main() -> int:
 
     
 
-    # pprint(nodes)
-    #     # print(n)
-    #     # print(n.text)
-    #     # print(type(n))
-    #     # # n.display()
-#    nodes = Test.BuildNodes()
-    # nodes = Test.nodes
-
-
-    # for key in nodes:
-    #     print(key)
-    #     nodes[key].display()
 
     # Test.DrawNodeBaseZero(i, coord)
     Test.DrawNodeBaseOne(i, coord)
