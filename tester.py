@@ -188,19 +188,47 @@ class Test:
         # ...which maybe makes sense
 
 
-    def DrawNodeComplex (image, coord):
+    def DrawNodeComplexA (image, coord):
         # tree consists of complex children
         nodes = Test.BuildNodes()
 
         node = nodes['e1']
         result = node.draw_node(image, coord)
         
-        # so this just stacks but doesn't draw lines
-
 
         return result
         
-#    def NodeMakerHelper (text, )
+
+    def SampleNodes ():
+    
+        a  = Node("I", [])
+        a0 = Node("D", [a])
+
+
+        ii = Node("I'", []) # empty for now, fix later
+
+
+
+
+        i  = Node("IP", [a0, ii])
+
+
+
+
+        return i
+
+
+    def DrawNodeComplexB (image, coord):
+        # tree consists of complex children
+        root = Test.SampleNodes()
+
+        result = root.draw_node(image, coord)
+        
+
+
+        return result
+
+
 
 
 
@@ -231,8 +259,9 @@ def main() -> int:
     # not sure if this passes or not
     # Test.DrawNodeBaseTriangleMany(i, coord)
 
-
-    Test.DrawNodeComplex(i, coord) 
+    
+    # Test.DrawNodeComplexA(i, coord) 
+    Test.DrawNodeComplexB(i, coord) 
 
 
     i.show()
