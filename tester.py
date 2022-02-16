@@ -99,13 +99,22 @@ class Test:
         # not a nested structure, properly
         # it's just a dict
         sen = 'Jamie was wondering about the dog'.split(' ')
+        cats = ['N', 'I', 'V', 'P', 'D', 'N']
+
+        # todo: join them
+        sen_with_cats = []
+        for i in range(len(sen)):
+            sen_with_cats.append(cats[i])
+            sen_with_cats.append(sen[i])
+
+        pprint(sen_with_cats)
 
         nodes = {}
 
-        node_names = ['a', 'b', 'c', 'd', 'e', 'f']
+        node_names = ['a0', 'a1', 'b0', 'b1', 'c0', 'c1', 'd0', 'd1', 'e0', 'e1', 'f0', 'f1']
 
         prev = None
-        sen_backwards = list(reversed(sen))
+        sen_backwards = list(reversed(sen_with_cats))
         print(sen)
         print(sen_backwards)
         for index, name in enumerate(node_names):
@@ -119,11 +128,11 @@ class Test:
             prev = nodes[name]
             print("prev is type " + str(type(prev)))
 
-        print(type(nodes['a']))
+        print(type(nodes['a0']))
         return nodes
    
     def DrawNodeBaseZero (image, coord):
-        # tree is a Node of nodes
+        # the tree is a Node of nodes
         # base case: node with no children
         # nodes = BuildNodes()
         
@@ -131,53 +140,67 @@ class Test:
         nodes = Test.BuildNodes()
 
 
-        node = nodes['a']
+        node = nodes['a0']
         result = node.draw_node(image, coord)
         return result
 
 
     def DrawNodeBaseOne (image, coord):
-        # tree is a Node of nodes
         # base case: node with one simple child
         nodes = Test.BuildNodes()
 
 
-        node = nodes['b']
+        node = nodes['a1']
         result = node.draw_node(image, coord)
         return result
 
 
 
 
-    def DrawNodeBaseTriangleZero (image, tree, coord):
-        # tree is a Node of nodes
+    def DrawNodeBaseTriangleZero (image, coord):
         # base case: triangle node with zero children
         result = coord
 
         return result
 
-    def DrawNodeBaseTriangleOne (image, tree, coord):
-        # tree is a Node of nodes
+    def DrawNodeBaseTriangleOne (image, coord):
+        # seems to work
         # base case: triangle node with one child
-        result = coord
+        nodes = Test.BuildNodes()
 
+
+        node = nodes['a1']
+        node.is_triangle = True
+        result = node.draw_node(image, coord)
         return result
         
-    def DrawNodeBaseTriangleMany (image, tree, coord):
-        # tree is a Node of nodes
+    def DrawNodeBaseTriangleMany (image, coord):
         # base case: triangle node with many children
-        result = coord
+        nodes = Test.BuildNodes()
+
+        node = nodes['e1']
+        node.is_triangle = True
+        result = node.draw_node(image, coord)
+        return result
+        
+        # seemingly not working
+        # it just triangles the text and the text of the child immediately below it, not all children
+        # ...which maybe makes sense
+
+
+    def DrawNodeComplex (image, coord):
+        # tree consists of complex children
+        nodes = Test.BuildNodes()
+
+        node = nodes['e1']
+        result = node.draw_node(image, coord)
+        
+        # so this just stacks but doesn't draw lines
+
 
         return result
         
-
-    def DrawNodeComplex (image, tree, coord):
-        # tree is a Node of nodes
-        # tree consists of complex children
-        result = coord
-
-        return result
-
+#    def NodeMakerHelper (text, )
 
 
 
@@ -185,21 +208,31 @@ def main() -> int:
     W, H = 2500, 1000
     i = Image.new("RGBA",(W,H),"white") # random
 
-    Test.LineDrawMath()
+    # Test.LineDrawMath()
 
     coord = (W/2, 50)
+
+
+#
     # Test.DrawLine(i, coord, 300, 100)
 
     # out = Test.DrawLine(i, coord, 50, 200)
     # out = Test.DrawTriangle(i, out, 300, 100)
     # out = Test.TextDrawSeparateLines(i, out)
     # i.show()
-
+#
     
 
 
     # Test.DrawNodeBaseZero(i, coord)
-    Test.DrawNodeBaseOne(i, coord)
+    # Test.DrawNodeBaseOne(i, coord)
+    # Test.DrawNodeBaseTriangleOne(i, coord)
+
+    # not sure if this passes or not
+    # Test.DrawNodeBaseTriangleMany(i, coord)
+
+
+    Test.DrawNodeComplex(i, coord) 
 
 
     i.show()
