@@ -4,10 +4,15 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 from draw import TextDraw, LineDraw
+from node import Node, connect_categories_and_words
 
 
 
 class Test:
+    def __init__(self):
+        None
+
+
     def TextDrawMath ():
         h = "Hello"
         td = TextDraw(h)
@@ -90,31 +95,125 @@ class Test:
         return line.draw_triangle(image)
 
 
+    def BuildNodes ():
+        # not a nested structure, properly
+        # it's just a dict
+        sen = 'Jamie was wondering about the dog'.split(' ')
+
+        nodes = {}
+
+        node_names = ['a', 'b', 'c', 'd', 'e', 'f']
+
+        prev = None
+        sen_backwards = list(reversed(sen))
+        print(sen)
+        print(sen_backwards)
+        for index, name in enumerate(node_names):
+
+            if prev:
+                nodes[name] = Node(sen_backwards[index], [prev])
+
+            else:
+                nodes[name] = Node(sen_backwards[index], [])
+
+            prev = nodes[name]
+            print("prev is type " + str(type(prev)))
+
+        print(type(nodes['a']))
+        return nodes
+   
+    def DrawNodeBaseZero (image, coord):
+        # tree is a Node of nodes
+        # base case: node with no children
+        # nodes = BuildNodes()
+        
+
+        nodes = Test.BuildNodes()
+
+
+        node = nodes['a']
+        result = node.draw_node(image, coord)
+        return result
+
+
+    def DrawNodeBaseOne (image, coord):
+        # tree is a Node of nodes
+        # base case: node with one simple child
+        nodes = Test.BuildNodes()
+
+
+        node = nodes['b']
+        result = node.draw_node(image, coord)
+        return result
+
+
+
+
+    def DrawNodeBaseTriangleZero (image, tree, coord):
+        # tree is a Node of nodes
+        # base case: triangle node with zero children
+        result = coord
+
+        return result
+
+    def DrawNodeBaseTriangleOne (image, tree, coord):
+        # tree is a Node of nodes
+        # base case: triangle node with one child
+        result = coord
+
+        return result
+        
+    def DrawNodeBaseTriangleMany (image, tree, coord):
+        # tree is a Node of nodes
+        # base case: triangle node with many children
+        result = coord
+
+        return result
+        
+
+    def DrawNodeComplex (image, tree, coord):
+        # tree is a Node of nodes
+        # tree consists of complex children
+        result = coord
+
+        return result
+
+
+
 
 def main() -> int:
     W, H = 2500, 1000
     i = Image.new("RGBA",(W,H),"white") # random
-
-    
-    # Test.TextDrawMath()
-    # coord = (W/2, 50)
-    # coord = Test.TextDrawMultiline(i, coord)
-    # # i.show()
-
-    # coord = (W/2, 500)
-    # Test.TextDrawSeparateLines(i, coord)
-    # i.show()
-
 
     Test.LineDrawMath()
 
     coord = (W/2, 50)
     # Test.DrawLine(i, coord, 300, 100)
 
-    out = Test.DrawLine(i, coord, 50, 200)
-    out = Test.DrawTriangle(i, out, 300, 100)
+    # out = Test.DrawLine(i, coord, 50, 200)
+    # out = Test.DrawTriangle(i, out, 300, 100)
+    # out = Test.TextDrawSeparateLines(i, out)
+    # i.show()
 
-    out = Test.TextDrawSeparateLines(i, out)
+    
+
+    # pprint(nodes)
+    #     # print(n)
+    #     # print(n.text)
+    #     # print(type(n))
+    #     # # n.display()
+#    nodes = Test.BuildNodes()
+    # nodes = Test.nodes
+
+
+    # for key in nodes:
+    #     print(key)
+    #     nodes[key].display()
+
+    # Test.DrawNodeBaseZero(i, coord)
+    Test.DrawNodeBaseOne(i, coord)
+
+
     i.show()
 
     return 0
