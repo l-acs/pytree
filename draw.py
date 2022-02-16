@@ -89,3 +89,21 @@ class LineDraw:
 
         print("This line has bottom_point_opposite ")
         pprint(self.bottom_point_opposite)
+
+
+    def draw_line (self, image):
+        d = ImageDraw.Draw(image)
+        d.line([self.top_point, self.bottom_point], fill = fill_color, width = thickness)
+        return self.bottom_point
+
+
+
+    def draw_triangle (self, image):
+        d = ImageDraw.Draw(image)
+        d.line([self.top_point, self.bottom_point], fill = fill_color, width = thickness)
+        d.line([self.top_point, self.bottom_point_opposite], fill = fill_color, width = thickness)
+        d.line([self.bottom_point, self.bottom_point_opposite], fill = fill_color, width = thickness)
+
+        # return the *center* of the bottom line
+        (top_x, top_y) = self.top_point
+        return (top_x, top_y + self.delta_y)

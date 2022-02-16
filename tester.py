@@ -80,22 +80,42 @@ class Test:
         line.display()
 
 
+    def DrawLine (image, coord, d_x, d_y):
+        line = LineDraw(coord, d_x, d_y)
+        return line.draw_line(image)
+
+
+    def DrawTriangle (image, coord, d_x, d_y):
+        line = LineDraw(coord, d_x, d_y)
+        return line.draw_triangle(image)
+
+
+
 def main() -> int:
     W, H = 2500, 1000
     i = Image.new("RGBA",(W,H),"white") # random
 
-
-    Test.TextDrawMath()
-    coord = (W/2, 50)
-    coord = Test.TextDrawMultiline(i, coord)
-    # i.show()
+    
+    # Test.TextDrawMath()
+    # coord = (W/2, 50)
+    # coord = Test.TextDrawMultiline(i, coord)
+    # # i.show()
 
     # coord = (W/2, 500)
-    Test.TextDrawSeparateLines(i, coord)
-    i.show()
+    # Test.TextDrawSeparateLines(i, coord)
+    # i.show()
 
 
     Test.LineDrawMath()
+
+    coord = (W/2, 50)
+    # Test.DrawLine(i, coord, 300, 100)
+
+    out = Test.DrawLine(i, coord, 50, 200)
+    out = Test.DrawTriangle(i, out, 300, 100)
+
+    out = Test.TextDrawSeparateLines(i, out)
+    i.show()
 
     return 0
 
