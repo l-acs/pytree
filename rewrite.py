@@ -11,71 +11,17 @@ font_size = 32
 font = ImageFont.truetype('FreeMono.ttf', font_size)
 margin = 50
 
+# likewise for thickness
+thickness = 3
+
 # how many pixels should vertically separate a node and its immediate children?
 line_height = 30
 
 # then just calculate and partition the horizontal space according to the number of children
 
 
-class Shape(Enum):
-    EMPTY = 0,
-    LINE = 1,
-    TRIANGLE = 3
 
-
-class Line:
-    def __init__ (self, shape):
-        self.shape = shape
-
-
-    def write_none (image, coordinate, delta_x = 0):
-        return coordinate
-        # only really here as a conceptual aid
-
-    def write_line (image, coordinate, delta_x = 0):
-        # todo: draw
-
-
-        out_x, out_y = coordinate
-        out_x += delta_x
-        out_y += line_height
-
-        return (out_x, out_y) # updated cursor
-
-
-
-    def write_triangle (image, coordinate, delta_x = 0):
-        # todo: draw
-
-
-
-        out_x, out_y = coordinate
-
-        # only applies to leaves, so cursor should not move left or right
-        out_y += line_height
-        return (out_x, out_y) # updated cursor
-
-
-
-    def draw (image, coordinate, delta_x = 0):
-        if (self.shape == 3):
-            return write_triangle(image, coordinate, delta_x)
-
-        if (self.shape == 1):
-            return write_line(image, coordinate, delta_x)
-
-        if (self.shape == 0):
-            return write_none(image, coordinate)
-
-
-
-class Leaf:
-    def __init__ (self, category, content, line = 0)
-        self.category = category
-        self.content = content
-        self.line = line
-
-
+class Write:
     def get_size_of (item):
         # figure out how big it would be to print this leaf with text aligned
         W = 10000
@@ -89,66 +35,130 @@ class Leaf:
 
         return (w, h)
 
-    def get_category_size ():
-        return get_size_of(self.category)
 
-    def get_content_size ():
-        return get_size_of(self.content)
+    def write_text (image, coordinate, text):
+        # this is basically in the wrong class, but it will do for now
 
-
-    def get_text_size (intermediate_line = False):
-        (category_w, category_h) = self.get_category_size()
-        (content_w, content_h) = self.get_content_size()
-
-        # (text_w, text_y) = (category_w + content_w,
-        #                     category_h + content_h)
-
-        w = max(category_w, content_w)
-        h = category_h + content_h
-
-        if (line == 1 or line == 3)
-            h += line_height
-
-        return (w, h)
-
-
-
-
-
-
-    def write_text (image, coordinate):
         # todo
         # steps:
 
         # 1) define cursor as coordinate_x and coordinate_y
-        # 2) move cursor left by half width of category
-        # 3) write category
-        # 4) move cursor back to coordinate_x and (coordinate_y + line_height)
-        # 5) move cursor left by half width of content
-        # 6) write content
+        # 2) move cursor left by half width of text
+        # 3) write text
+        # 4) move cursor back to coordinate_x and (coordinate_y + text height)
+        # 5) return cursor
+
+        (cursor_x, cursor_y) = coordinate
+
+        (size_w, size_h) = Write.get_size_of(text)
+
+        # move cursor to where text should begin
+        cursor_x -= (size_w / 2)
 
 
-        image.text((cursor_x, cursor_y), this.category, font=font, fill =(255, 0, 0))
+        d = ImageDraw.Draw(image)
+        d.text((cursor_x, cursor_y), text, font=font, fill=(0, 0, 0))
 
-#        cursor_x = (width
+        # move cursor back to center
+        cursor_x += (size_w / 2)
 
-
-
+        # move cursor down to below text
+        cursor_y += size_h 
 
         # return the *cursor*!
-        return
+        return (cursor_x, cursor_y)
+        # N.B. this does not pad height, yet
 
 
 
 
+class Shape(Enum):
+    EMPTY = 0,
+    LINE = 1,
+    TRIANGLE = 3
 
 
-    def write (image, coordinate):
-        cursor = write_text(image, coordinate, self.category)
+class Line:
+    def __init__ (self, shape):
+        self.shape = shape
 
-        cursor = line.draw(image, cursor, 0) # a leaf shouldn't represent a x-axis change
 
-        cursor = write_text(image, cursor, self.content)
+    def write_none (self, image, coordinate, delta_x = 0):
+        return coordinate
+        # only really here as a conceptual aid
+
+    def write_line (self, image, coordinate, delta_x = 0):
+        out_x, out_y = coordinate
+        out_x += delta_x
+        out_y += line_height
+
+        # todo: actually draw
+        # from coordinate to (out_x, out_y)
+
+        # untested attempt at that:
+        d = ImageDraw.Draw(image)
+        d.line([coordinate, (out_x, out_y)], fill = None, width = thickness)
+
+
+
+        return (out_x, out_y) # updated cursor
+
+
+
+    def write_triangle (self, image, coordinate, delta_x = 0):
+        (start_x, start_y) = coordinate
+
+
+        
+        left_x = start_x - delta_x
+        right_x = start_x + delta_x
+        y = start_y + line_height
+
+        # todo: draw
+        # from coordinate to (left_x, y)
+        # from coordinate to (right_x, y)
+
+        # untested attempt at that:
+        d = ImageDraw.Draw(image)
+        d.line([coordinate, (left_x, y)], fill = None, width = thickness)
+        d.line([coordinate, (right_x, y)], fill = None, width = thickness)
+
+
+
+        # triangles only apply to (effective) leaves, so cursor should not move left or right
+        return (start_x, y) # updated cursor
+
+
+
+    def draw (self, image, coordinate, delta_x = 0):
+        # does this need to be something to the effect of
+        # Shape.(self.shape)
+        # ?
+
+        if (self.shape.value == 3):
+            return self.write_triangle(image, coordinate, delta_x)
+
+        if (self.shape.value == 1):
+            return self.write_line(image, coordinate, delta_x)
+
+        if (self.shape.value == 0):
+            return self.write_none(image, coordinate)
+
+
+
+class Leaf:
+    def __init__ (self, category, content, line = Line(Shape.EMPTY)):
+        self.category = category
+        self.content = content
+        self.line = line
+
+
+    def write (self, image, coordinate):
+        cursor = Write.write_text(image, coordinate, self.category)
+
+        cursor = self.line.draw(image, cursor, 0) # a leaf shouldn't represent a x-axis change
+
+        cursor = Write.write_text(image, cursor, self.content)
 
         return cursor
 
@@ -163,3 +173,25 @@ class Tree:
 
 
     # every child is either a leaf or a tree
+
+
+
+
+def __main__ (__argv__):
+    # lol I don't think this is right
+
+    ex1 = Leaf("D", "John", Line(Shape.TRIANGLE)) # this doesn't raise an exception
+    ex2 = Leaf("D", "John", Line(Shape.LINE)) # this does
+    ex3 = Leaf("D", "John") # and so does this
+
+    W, H = 1000, 1000
+    image = Image.new("RGBA",(W,H),"white") # random
+
+
+    ex3.write(image, (200, 200))
+
+    image.show()
+
+
+
+    return
