@@ -205,7 +205,8 @@ class Test:
         a0 = Node("D", [a])
 
 
-        ii = Node("I'", []) # empty for now, fix later
+        iii_temp = Node("love t_i my dog")
+        ii = Node("I'", [iii_temp], is_triangle = True) # empty for now, fix later
 
 
 
@@ -235,7 +236,6 @@ class Test:
 def main() -> int:
     W, H = 2500, 1000
     i = Image.new("RGBA",(W,H),"white") # random
-
     # Test.LineDrawMath()
 
     coord = (W/2, 50)
@@ -243,7 +243,6 @@ def main() -> int:
 
 #
     # Test.DrawLine(i, coord, 300, 100)
-
     # out = Test.DrawLine(i, coord, 50, 200)
     # out = Test.DrawTriangle(i, out, 300, 100)
     # out = Test.TextDrawSeparateLines(i, out)
@@ -251,14 +250,14 @@ def main() -> int:
 #
     
 
-
+#
     # Test.DrawNodeBaseZero(i, coord)
     # Test.DrawNodeBaseOne(i, coord)
     # Test.DrawNodeBaseTriangleOne(i, coord)
 
     # not sure if this passes or not
     # Test.DrawNodeBaseTriangleMany(i, coord)
-
+#
     
     # Test.DrawNodeComplexA(i, coord) 
     Test.DrawNodeComplexB(i, coord) 

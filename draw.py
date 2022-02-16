@@ -4,7 +4,7 @@ from pprint import pprint
 
 
 
-font_size = 20
+font_size = 40
 font = ImageFont.truetype('FreeMono.ttf', font_size)
 margin = 50
 fill_color = (0, 0, 0)
@@ -13,7 +13,7 @@ thickness = 4
 
 # how many pixels should vertically separate a node and its immediate children?
 # unused so far; so far an actual parameter is taken
-line_height = 30
+line_height = 100
 
 
 

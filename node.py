@@ -4,13 +4,16 @@ from draw import TextDraw, LineDraw, line_height
 from pprint import pprint
 
 connect_categories_and_words = False
-# sort of works when True, the line still cuts through them
 
-connect_categories_and_words = True
+# connect_categories_and_words = True
+# when True, the line cuts through the category
+# (it goes directly from its branch down through the middle of the category and up until the terminal text )
+
+width = 150
 
 # so the recursion works but it's not properly moving the cursor
 class Node:
-    def __init__ (self, text, children, is_triangle = False):
+    def __init__ (self, text, children = [], is_triangle = False):
         self.text = text
         self.children = children # themselves just nodes!
         self.is_triangle = is_triangle
@@ -44,11 +47,10 @@ class Node:
             # this means that this node is a category and the other node is text
             # _or_, it means that there's multiple children and it's a triangle
 
-            # first, draw the text
 
             # now, connect if applicable
             if (self.is_triangle): # draw a triangle
-              d_x = 50 # super arbitrary, todo: fix
+              d_x = width # super arbitrary, todo: fix
 
               d_y = line_height
 
@@ -88,23 +90,16 @@ class Node:
 
 
             # draw left
-            d_x = 50
+            d_x = width
             d_y = line_height
             
             # left:
-            line = LineDraw(acc_coord, -1 * d_x, d_y)
-            acc_coord_left = line.draw_line(image)
-
-            
-            # now draw the subsequent text
-            td = TextDraw(self.text) # does this need to be a new one?
-            acc_coord_left = td.draw(image, acc_coord_left)
-
-
+            line_left = LineDraw(acc_coord, -1 * d_x, d_y)
+            acc_coord_left = line_left.draw_line(image)
 
             # right:
-            line = LineDraw(acc_coord, d_x, d_y)
-            acc_coord_right = line.draw_line(image)
+            line_right = LineDraw(acc_coord, d_x, d_y)
+            acc_coord_right = line_right.draw_line(image)
 
 
             # recurse
