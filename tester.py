@@ -201,14 +201,27 @@ class Test:
 
     def SampleNodes ():
     
-        a  = Node("I", [])
-        a0 = Node("D", [a])
+        a  = Node("I")
+        a1 = Node("D", [a])
+        a0 = Node("DP", [a1])
 
 
-        iii_temp = Node("love t_i my dog")
-        ii = Node("I'", [iii_temp], is_triangle = True) # empty for now, fix later
+        b = Node("love_i")
+        b0 = Node("I", [b])
 
+        c = Node("t_i")
+        c0 = Node("V", [c])
 
+        d = Node("my")
+        d0 = Node("D", [d])
+
+        e = Node("dog")
+        e0 = Node("N", [e])
+
+        iv = Node("DP", [d0, e0])
+
+        iii = Node("VP", [c0, iv])
+        ii = Node("I'", [b0, iii]) # empty for now, fix later
 
 
         i  = Node("IP", [a0, ii])

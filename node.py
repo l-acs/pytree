@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 # from pprint import pprint
-from draw import TextDraw, LineDraw, line_height
+from draw import TextDraw, LineDraw, line_height, margin, padding
 from pprint import pprint
 
 connect_categories_and_words = False
