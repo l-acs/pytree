@@ -61,3 +61,31 @@ class TextDraw:
         
 
 
+
+
+
+class LineDraw:
+    def __init__ (self, top_point, delta_x, delta_y):
+        self.top_point = top_point
+        self.delta_x = delta_x
+        self.delta_y = delta_y
+
+        (top_x, top_y) = top_point
+
+        self.bottom_point = (top_x + delta_x, top_y + delta_y) # right
+        self.bottom_point_opposite = (top_x - delta_x, top_y + delta_y) # left
+
+        
+
+    def display (self):
+        print("This line has top_point ")
+        pprint(self.top_point)
+
+        print("delta_x and delta_y are ")
+        pprint((self.delta_x, self.delta_y))
+
+        print("This line has bottom_point ")
+        pprint(self.bottom_point)
+
+        print("This line has bottom_point_opposite ")
+        pprint(self.bottom_point_opposite)

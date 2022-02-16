@@ -3,7 +3,7 @@ from pprint import pprint
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
-from draw import TextDraw
+from draw import TextDraw, LineDraw
 
 
 
@@ -63,6 +63,23 @@ class Test:
 
         return coord
 
+
+    def LineDrawMath ():
+        print("hey")
+        coord = (100, 50)
+
+
+        W, H = 1000, 1000
+        i = Image.new("RGBA",(W,H),"white") # random
+
+        delta_x, delta_y = (50, 100)
+
+
+        line = LineDraw(coord, delta_x, delta_y)
+
+        line.display()
+
+
 def main() -> int:
     W, H = 2500, 1000
     i = Image.new("RGBA",(W,H),"white") # random
@@ -76,6 +93,9 @@ def main() -> int:
     # coord = (W/2, 500)
     Test.TextDrawSeparateLines(i, coord)
     i.show()
+
+
+    Test.LineDrawMath()
 
     return 0
 
