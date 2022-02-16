@@ -78,7 +78,7 @@ class Shape(Enum):
     TRIANGLE = 3
 
 
-class Line:
+class Line: # should this extend Shape?
     def __init__ (self, shape):
         self.shape = shape
 
@@ -153,12 +153,15 @@ class Leaf:
         self.line = line
 
 
-    def write (self, image, coordinate):
+    def write (self, image, coordinate, delta_x):
         cursor = Write.write_text(image, coordinate, self.category)
 
-        cursor = self.line.draw(image, cursor, 0) # a leaf shouldn't represent a x-axis change
+        cursor = self.line.draw(image, cursor, delta_x) 
 
-        cursor = Write.write_text(image, cursor, self.content)
+        (cursor_x, cursor_y) = cursor
+        cursor_x -= delta_x # a leaf shouldn't represent a x-axis change
+
+        cursor = Write.write_text(image, (cursor_x, cursor_y), self.content)
 
         return cursor
 
@@ -175,11 +178,19 @@ class Tree:
     # every child is either a leaf or a tree
 
 
+def test_traingle ():
+    image = Image.new("RGBA", (31000, 1000), "white")
+    l = Line(Shape.TRIANGLE)
+
+    l.write_triangle(image, coordinate = (300, 300), delta_x = 100)
+    image.show()
+
+
 
 
 def __main__ (__argv__):
     # lol I don't think this is right
-
+    print ("stuffs")
     ex1 = Leaf("D", "John", Line(Shape.TRIANGLE)) # this doesn't raise an exception
     ex2 = Leaf("D", "John", Line(Shape.LINE)) # this does
     ex3 = Leaf("D", "John") # and so does this
@@ -187,11 +198,14 @@ def __main__ (__argv__):
     W, H = 1000, 1000
     image = Image.new("RGBA",(W,H),"white") # random
 
-
-    ex3.write(image, (200, 200))
+    ex1.write(image, (200, 200), 50)
+    # ex2.write(image, (200, 200))
+    # ex3.write(image, (200, 200))
 
     image.show()
-
+    test_traingle()
 
 
     return
+
+__main__('')
