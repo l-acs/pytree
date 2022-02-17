@@ -4,39 +4,40 @@ import pyparsing as pp
 
 # docs here
 # https://pyparsing-docs.readthedocs.io/en/latest/HowToUsePyparsing.html#usage-notes
+class Parse:
+    RETURN_PYTHON_COLLECTIONS = True # set to False to return ParseResults instead
 
-RETURN_PYTHON_COLLECTIONS = True # set to False to return ParseResults instead
-
-delims =  "<>[]"
-LANGLE, RANGLE, LBRACK, RBRACK = map(pp.Suppress, delims)
-
-label = pp.Word(pp.printables, exclude_chars=delims) # formerly jsonString
-
-tree = pp.Forward().setName("tree") # formerly jsonObject
-node = pp.Forward().setName("node") # formerly jsonValue
-triangle = pp.Forward().setName("triangle") # formerly "jsonArray"
+    delims =  "<>[]"
+    LANGLE, RANGLE, LBRACK, RBRACK = map(pp.Suppress, delims)
 
 
-node << (label | tree | triangle)
+    label = pp.Word(pp.printables, exclude_chars=delims) # formerly jsonString
+
+    tree = pp.Forward().setName("tree") # formerly jsonObject
+    node = pp.Forward().setName("node") # formerly jsonValue
+    triangle = pp.Forward().setName("triangle") # formerly "jsonArray"
 
 
-memberDef = pp.Group(
-    label + pp.ZeroOrMore(node), aslist=RETURN_PYTHON_COLLECTIONS
-).setName("treeMember")
+    node << (label | tree | triangle)
 
-treeMembers = pp.delimitedList(memberDef).setName(None)
 
-tree << pp.Dict(
-    LBRACK + pp.Optional(treeMembers) + RBRACK, asdict=RETURN_PYTHON_COLLECTIONS
-)
+    memberDef = pp.Group(
+        label + pp.ZeroOrMore(node), aslist=RETURN_PYTHON_COLLECTIONS
+    ).setName("treeMember")
 
-triangle << pp.Combine(
-    LANGLE + pp.original_text_for(pp.Optional(treeMembers)) + RANGLE, adjacent=False
-    # N.B.: anything below a triangle is treated literally, even if it would otherwise form valid tree or triangle data
-)
+    treeMembers = pp.delimitedList(memberDef).setName(None)
 
-def parse (s):
-    return tree.parseString(s)
+    tree << pp.Dict(
+        LBRACK + pp.Optional(treeMembers) + RBRACK, asdict=RETURN_PYTHON_COLLECTIONS
+    )
+    
+    triangle << pp.Combine(
+        LANGLE + pp.original_text_for(pp.Optional(treeMembers)) + RANGLE, adjacent=False
+        # N.B.: anything below a triangle is treated literally, even if it would otherwise form valid tree or triangle data
+    )
+
+    def parse (s):
+        return (Parse.tree).parseString(s)
 
 
 # once we actually turn this into nodes, we can just set the
