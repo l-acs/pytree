@@ -29,19 +29,37 @@ triangle = pp.Forward().setName("triangle")
 node << (label | tree | triangle)
 
 
-memberDef = pp.Group(
+treeMemberDef = pp.Group(
     label + pp.ZeroOrMore(node), aslist=RETURN_PYTHON_COLLECTIONS
-).setName("jsonMember")
+).setName("treeMember")
 
-treeMembers = pp.delimitedList(memberDef).setName(None)
+treeMembers = pp.delimitedList(treeMemberDef).setName(None)
+
+triangleMemberDef = pp.Group(
+    # todo: add some kind of boolean flag
+    label + pp.ZeroOrMore(node), aslist=RETURN_PYTHON_COLLECTIONS
+).setName("triangleMember")
+
+triangleMembers = pp.delimitedList(treeMemberDef).setName(None)
+
 
 tree << pp.Dict(
     LBRACK + pp.Optional(treeMembers) + RBRACK, asdict=RETURN_PYTHON_COLLECTIONS
 )
 
-triangle << pp.Dict(
-    LANGLE + pp.Optional(treeMembers) + RANGLE, asdict=RETURN_PYTHON_COLLECTIONS
-)
+triangle << pp.Combine(
+    LANGLE + pp.Optional(treeMembers) + RANGLE, adjacent=False
+).setParseAction(pp.removeQuotes)
+                 #with_attribute(is_triangle=True))
+# triangle << pp.Group(
+#     LANGLE + pp.Optional(treeMembers) + RANGLE
+# ).setParseAction(pp.with_attribute(is_triangle = True))
+
+
+
+# idea: if it's a list, not a dict, then we know it's a triangle
+# that's intuitive, right?
+
 # formerly "jsonArray"
 
 
