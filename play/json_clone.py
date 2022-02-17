@@ -12,29 +12,40 @@ LANGLE, RANGLE, LBRACK, RBRACK = map(pp.Suppress, delims)
 label = pp.Word(pp.printables, exclude_chars=delims) #dblQuotedString().setParseAction(pp.removeQuotes)
 # formerly jsonString
 
-tree = pp.Forward().setName("tree")
-node = pp.Forward().setName("node")
+tree = pp.Forward().setName("tree") # formerly jsonObject
+node = pp.Forward().setName("node") # formerly jsonValue
 
-jsonElements = pp.delimitedList(node).setName(None)
+# jsonElements = pp.delimitedList(node).setName(None)
 
-triangle = pp.Group( # not working right
-    LANGLE + pp.Optional(jsonElements) + RANGLE, aslist=RETURN_PYTHON_COLLECTIONS
-).setName("triangle")
-# formerly "jsonArray"
+# triangle = pp.Group( # not working right
+#     LANGLE + pp.Optional(jsonElements) + RANGLE, aslist=RETURN_PYTHON_COLLECTIONS
+# ).setName("triangle")
+# # formerly "jsonArray"
+triangle = pp.Forward().setName("triangle")
+
+
+
 
 node << (label | tree | triangle)
-# formerly jsonValue
 
 
 memberDef = pp.Group(
     label + pp.ZeroOrMore(node), aslist=RETURN_PYTHON_COLLECTIONS
 ).setName("jsonMember")
 
-jsonMembers = pp.delimitedList(memberDef).setName(None)
+treeMembers = pp.delimitedList(memberDef).setName(None)
 
 tree << pp.Dict(
-    LBRACK + pp.Optional(jsonMembers) + RBRACK, asdict=RETURN_PYTHON_COLLECTIONS
+    LBRACK + pp.Optional(treeMembers) + RBRACK, asdict=RETURN_PYTHON_COLLECTIONS
 )
+
+triangle << pp.Dict(
+    LANGLE + pp.Optional(treeMembers) + RANGLE, asdict=RETURN_PYTHON_COLLECTIONS
+)
+# formerly "jsonArray"
+
+
+# it works! but it doesn't distinguish between them... hmm
 
 
 def parse (s):
