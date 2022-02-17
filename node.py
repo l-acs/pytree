@@ -9,9 +9,8 @@ connect_categories_and_words = False
 # when True, the line cuts through the category
 # (it goes directly from its branch down through the middle of the category and up until the terminal text )
 
-width = 150
+default_width = 300
 
-# so the recursion works but it's not properly moving the cursor
 class Node:
     def __init__ (self, text, children = [], is_triangle = False):
         self.text = text
@@ -30,7 +29,7 @@ class Node:
         print('---' * 20)
 
 
-    def draw_node (self, image, coord):
+    def draw_node (self, image, coord, width=default_width):
         # todo: figure out where/how d_x comes into play
 
         td = TextDraw(self.text)
@@ -80,14 +79,13 @@ class Node:
             acc_coord = line.draw_line(image)
 
             # recurse
-            self.children[0].draw_node(image, acc_coord)
+            self.children[0].draw_node(image, acc_coord, width / 2)
                         
 
         else: # this means there's complex children
-            # for child in self.children:
 
-            # todo: draw line! this doesn't draw lines on its own
-
+            # ideally, this should somehow be `for child in self.children`
+            # binary only for now
 
             # draw left
             d_x = width
@@ -103,8 +101,8 @@ class Node:
 
 
             # recurse
-            self.children[0].draw_node(image, acc_coord_left) # todo: figure out x-axis movement
-            self.children[1].draw_node(image, acc_coord_right) # todo: figure out x-axis movement
+            self.children[0].draw_node(image, acc_coord_left, width / 2) # todo: figure out x-axis movement
+            self.children[1].draw_node(image, acc_coord_right, width / 2) # todo: figure out x-axis movement
 
 
 
