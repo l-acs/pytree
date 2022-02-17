@@ -10,44 +10,10 @@
 # etc.
 
 import sys
-sys.path.append("/home/l-acs/projects/python/pytree")
 from parse import Parse as p
-
 from node import Node
 
 # # okay, now link up node and ParseResults
-
-def pr_to_tree_root (pr):
-    if (len(pr) != 1):
-        return None # we require *exactly one* top-level tree
-
-    return pr[0]
-
-
-# n.b. difference between triangle and non-triangle w/ multiple arguments
-pr_to_tree_root(p.parse("[DP [D' my dear old friend]]"))
-# >>> {'DP': {"D'": ['my', 'dear', 'old', 'friend']}}
-
-pr_to_tree_root(p.parse("[DP <D' my dear old friend>]"))
-# >>> {'DP': "D' my dear old friend"}
-
-
-# and w/ single argument
-pr_to_tree_root(p.parse("[DP [D' John]]"))
-# >>>> {'DP': {"D'": 'John'}}
-
-pr_to_tree_root(p.parse("[DP <D' John>]"))
-# >>> {'DP': "D' John"}
-
-# therefore a dictionary whose value is a multi-word string is guaranteed to be a triangle
-
-# and a dictionary whose value is a list of strings is guaranteed to be a node representing a single category with two or more leaf children
-# this has no meaning but is possible
-
-
-
-
-
 # cases to handle
 def leaf (text): # takes no children
     return Node(text)
@@ -69,7 +35,7 @@ def triangle (text):
 def is_triangle (text):
     text_pieces = text.split(' ')
     return len(text_pieces) > 1
-        
+
 
 def handle (label, item):
     # there is always a LHS and a RHS of a map entry
@@ -89,8 +55,8 @@ def handle_text(label, text):
     # handle a leaf and its label, whether that leaf is a triangle or not
 
     if is_triangle(text):
-#        inner = triangle(text) # node
-#        return Node(label, [inner], True)
+        #        inner = triangle(text) # node
+        #        return Node(label, [inner], True)
         return triangle(text)
 
     else:
@@ -122,20 +88,74 @@ def handle_list (label, l):
             node = handle(k, v)
 
         sub_nodes.append(node)
-    
+        
 
     return Node(label, sub_nodes)
 
 
-# I think!! it works!!!
-cat, rest = pr_to_tree_root(p.parse("[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will] [VP [V be] [P here]]]]")).popitem()
-handle(cat, rest).display()
+
+class Convert:    
+    def __init__ (self, p_results):
+        self.pr = p_results
+        self.root = self.to_root()
+
+    def to_root (self):
+        if (len(self.pr) != 1):
+            return None # we require *exactly one* top-level tree
+    
+        return self.pr[0]
+    
+    
+    def to_tree (self):
+        cat, rest = self.root.popitem()
+        return handle(cat, rest)
+    
+    
+    # one issue exists: some triangles are not being recognized as triangles
+    # more specifically, if a would-be triangle has a sister, it isn't recognized as being a triangle
+
+def __nota_bene__():
+    from pprint import pprint
+
+    def bar():
+        print('- ' * 20 + '-')
+
+    print("N.B. the difference between a non-triangle and a triangle, when taking multiple arguments:")
+    pprint(Convert(p.parse("[DP [D' my dear old friend]]")).root)
+    # >>> {'DP': {"D'": ['my', 'dear', 'old', 'friend']}}
+
+    pprint(Convert(p.parse("[DP <D' my dear old friend>]")).root)
+    # >>> {'DP': "D' my dear old friend"}
+
+    bar()
+    print("and when taking a single argument:")
+    pprint(Convert(p.parse("[DP [D' John]]")).root)
+    # >>>> {'DP': {"D'": 'John'}}
+
+    pprint(Convert(p.parse("[DP <D' John>]")).root)
+    # >>> {'DP': "D' John"}
+
+    bar()
+    print("Therefore, a dictionary whose value is a multi-word string is guaranteed to be a triangle,")
+    print("and a dictionary whose value is a list of strings is guaranteed to represent a node with a")
+    print("single category and two or more leaf children.")
+    print("(The latter has no meaning to my knowledge but is possible.)")
 
 
-def parser_results_to_tree (pr):
-    cat, rest = pr_to_tree_root(pr).popitem()
-    return handle(cat, rest)
 
+if __name__ == "__main__":
+    W, H = 2500, 1000
+    coord = (W/2, 50)
 
-# one issue exists: some triangles are not being recognized as triangles
-# more specifically, if a would-be triangle has a sister, it isn't recognized as being a triangle
+    from PIL import Image
+    image = Image.new("RGBA",(W,H),"white") # random
+
+    s = "[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will    ] [VP [V be] [P here]]]]"
+    pr = p.parse(s)
+
+    tree = Convert(pr).to_tree()
+
+    # tree.draw_node(image, coord)
+    # image.show()
+
+    __nota_bene__()
