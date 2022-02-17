@@ -48,11 +48,9 @@ tree << pp.Dict(
 )
 
 triangle << pp.Combine(
-    LANGLE + pp.Optional(treeMembers) + RANGLE, adjacent=False
-).setParseAction(pp.removeQuotes)
-                 #with_attribute(is_triangle=True))
-# triangle << pp.Group(
-#     LANGLE + pp.Optional(treeMembers) + RANGLE
+    LANGLE + pp.original_text_for(pp.Optional(treeMembers)) + RANGLE, adjacent=False
+)
+# almost there, just need to mark it as being a triangle
 # ).setParseAction(pp.with_attribute(is_triangle = True))
 
 
