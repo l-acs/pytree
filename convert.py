@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
     tree = Convert(pr).to_tree()
 
-    # tree.draw_node(image, coord)
-    # image.show()
+    tree.draw_node(image, coord)
+    image.show()
 
     __nota_bene__()
