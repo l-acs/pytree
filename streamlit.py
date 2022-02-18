@@ -62,8 +62,30 @@ tree_text = st.text_area(label = "Enter your tree here:",
                          height = len(t.sample.splitlines()) * 20)
 
 progress_bar = st.checkbox("Show progress bar")
+left_button, right_button, _ = st.columns([1, 1, 2]) # (2)
 
-generate_tree = st.button("Generate this tree")
+def btn_generate_tree(button_column = left_button, key = "default"):
+    with button_column:
+        result = st.button("Generate this tree", key=key)
+
+    return result
+
+
+def btn_download_tree(button_column = right_button, fname = f):
+    with open(fname, "rb") as file:
+        if file:
+            with button_column:
+                btn = st.download_button(
+                    label="Download tree",
+                    data=file,
+                    file_name= filename_for_download(),
+                    mime="image/png"
+                )
+                return btn
+
+# show the plain generate button
+generate_tree = btn_generate_tree(left_button)
+
 
 if generate_tree and tree_text:
     try:
@@ -101,14 +123,8 @@ if generate_tree and tree_text:
         st.success("Your tree has been generated!")
 
         # provide download button
-        with open(f, "rb") as file:
-            if file:
-                btn = st.download_button(
-                    label="Download tree",
-                    data=file,
-                    file_name= filename_for_download(),
-                    mime="image/png"
-                ) # todo: use a container so that it's side by side with the generate button
+        btn_download_tree(right_button, f)
+
 
     except p.ParseError:
         st.warning("It looks like that's not a valid tree! Please edit your text and try again.")
