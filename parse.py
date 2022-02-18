@@ -1,10 +1,14 @@
 import pyparsing as pp
+
 # many thanks to this example:
 # https://github.com/pyparsing/pyparsing/blob/master/examples/jsonParser.py
 
-# docs here
+# docs here:
 # https://pyparsing-docs.readthedocs.io/en/latest/HowToUsePyparsing.html#usage-notes
+
 class Parse:
+    ParseError = pp.ParseException
+
     RETURN_PYTHON_COLLECTIONS = True # set to False to return ParseResults instead
 
     delims =  "<>[]"

@@ -66,52 +66,62 @@ progress_bar = st.checkbox("Show progress bar")
 generate_tree = st.button("Generate this tree")
 
 if generate_tree and tree_text:
-    parsed_tree = Convert(string = tree_text).to_tree()
-    image = t.save_tree(parsed_tree, f)
+    try:
 
-    if progress_bar: # stalling
-        latest_iteration = st.empty()
-        bar = st.progress(0)
-        sleep_time = 0.05
+        parsed_tree = Convert(string = tree_text).to_tree()
+        image = t.save_tree(parsed_tree, f)
 
-        for i in range(100):
-            latest_iteration.text(f'{i+1}% complete...')
-            bar.progress(i + 1)
+        if progress_bar: # stalling
+            latest_iteration = st.empty()
+            bar = st.progress(0)
+            sleep_time = 0.05
 
-            if (i == 10):
-                sleep_time = 0.01
+            for i in range(100):
+                latest_iteration.text(f'{i+1}% complete...')
+                bar.progress(i + 1)
 
-            if (i == 90):
-                sleep_time = 0.05
+                if (i == 10):
+                    sleep_time = 0.01
 
-            if (i == 95):
-                sleep_time = 0.1
+                if (i == 90):
+                    sleep_time = 0.05
 
-            sleep(sleep_time)
-            if (i > 40 and i < 80):
-                i += 1
+                if (i == 95):
+                    sleep_time = 0.1
 
-        # st.balloons() # maybeeee
+                sleep(sleep_time)
+                if (i > 40 and i < 80):
+                    i += 1
+
+            # st.balloons() # maybeeee
 
 
-    # update the onscreen graphic
-    st_show_tree(f)
-    st.success("Your tree has been generated!")
+        # update the onscreen graphic
+        st_show_tree(f)
+        st.success("Your tree has been generated!")
 
-    # provide download button
-    with open(f, "rb") as file:
-        if file:
-            btn = st.download_button(
-                label="Download tree",
-                data=file,
-                file_name= filename_for_download(),
-                mime="image/png"
-            ) # todo: use a container so that it's side by side with the generate button
+        # provide download button
+        with open(f, "rb") as file:
+            if file:
+                btn = st.download_button(
+                    label="Download tree",
+                    data=file,
+                    file_name= filename_for_download(),
+                    mime="image/png"
+                ) # todo: use a container so that it's side by side with the generate button
 
-        
+    except p.ParseError:
+        st.warning("It looks like that's not a valid tree! Please edit your text and try again.")
+
 
 # now run this as:
 # streamlit run this_file_path
 # (from root of repository, as that's where paths are relative to)
 
 # todo: handle invalid input gracefully
+
+
+# todo: always start with the same image, default.png
+# (doesn't yet exist)
+
+# which should match t.sample
