@@ -32,7 +32,7 @@ outfile = "out.png"
 
 def create_tree (s):
     pr = p.parse(s)
-    tree = Convert(pr).to_tree()
+    tree = Convert(parse_results = pr).to_tree()
     return tree
 
 

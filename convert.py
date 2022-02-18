@@ -95,8 +95,11 @@ def handle_list (label, l):
 
 
 class Convert:    
-    def __init__ (self, p_results):
-        self.pr = p_results
+    def __init__ (self, string = None, parse_results = None):
+        if (string != None):
+            parse_results = p.parse(string)
+
+        self.pr = parse_results
         self.root = self.to_root()
 
     def to_root (self):
@@ -121,18 +124,18 @@ def __nota_bene__():
         print('- ' * 20 + '-')
 
     print("N.B. the difference between a non-triangle and a triangle, when taking multiple arguments:")
-    pprint(Convert(p.parse("[DP [D' my dear old friend]]")).root)
+    pprint(Convert("[DP [D' my dear old friend]]").root)
     # >>> {'DP': {"D'": ['my', 'dear', 'old', 'friend']}}
 
-    pprint(Convert(p.parse("[DP <D' my dear old friend>]")).root)
+    pprint(Convert("[DP <D' my dear old friend>]").root)
     # >>> {'DP': "D' my dear old friend"}
 
     bar()
     print("and when taking a single argument:")
-    pprint(Convert(p.parse("[DP [D' John]]")).root)
+    pprint(Convert("[DP [D' John]]").root)
     # >>>> {'DP': {"D'": 'John'}}
 
-    pprint(Convert(p.parse("[DP <D' John>]")).root)
+    pprint(Convert("[DP <D' John>]").root)
     # >>> {'DP': "D' John"}
 
     bar()
@@ -153,7 +156,7 @@ if __name__ == "__main__":
     s = "[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will    ] [VP [V be] [P here]]]]"
     pr = p.parse(s)
 
-    tree = Convert(pr).to_tree()
+    tree = Convert(parse_results = pr).to_tree()
 
     tree.draw_node(image, coord)
     image.show()
