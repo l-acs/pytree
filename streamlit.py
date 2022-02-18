@@ -4,10 +4,6 @@ from time import sleep
 from datetime import datetime
 from os.path import exists
 
-# temporarily:
-import sys
-sys.path.append("/home/l-acs/projects/python/pytree")
-
 from parse import Parse as p
 from convert import Convert
 import tree_utils as t
@@ -24,6 +20,7 @@ st.set_page_config(
 st.title("pytree")
 st.header(h)
 
+tree_graphic = st.empty() # placeholder that will be filled with the auto-updating tree
 
 
 def default_tree (filename = parent_dir + t.outfile):
@@ -38,12 +35,14 @@ def gen_tree_if_not_exists (fname = parent_dir + t.outfile):
         default_tree(fname)
     
 
-def st_show_tree (fname = parent_dir + t.outfile):
+def st_show_tree (fname = parent_dir + t.outfile, tree_container = tree_graphic):
     gen_tree_if_not_exists(fname)
 
     if exists(fname):
         with open(fname, "rb") as file:
-            st.image(f)
+            with tree_container.container():
+                st.image(f)
+
     else:
         st.warning("Error showing tree image!")
         
@@ -54,68 +53,65 @@ def filename_for_download (filename_prefix = 'tree', filetype = 'png'):
     return filename_prefix + now.strftime(date_exp) + '.' + filetype
 
 
-
 # now run streamlit s.t. you see the image!
-
 st_show_tree(f)
-# tree_text = st.text_input(label = "Enter your tree here:",
-
 
 # https://docs.streamlit.io/library/api-reference/widgets/st.text_area
 tree_text = st.text_area(label = "Enter your tree here:",
                          value = t.sample,
                          height = len(t.sample.splitlines()) * 20)
 
-
-
-# NOTE: this does *not* yet parse new trees. It's just the example for now
-
-
 progress_bar = st.checkbox("Show progress bar")
 
-with open(f, "rb") as file:
-    if file:
-        btn = st.download_button(
-            label="Download tree",
-            data=file,
-            file_name= filename_for_download(),
-            mime="image/png"
-        )
+generate_tree = st.button("Generate this tree")
 
-if progress_bar:
-    latest_iteration = st.empty()
-    bar = st.progress(0)
-    sleep_time = 0.05
+if generate_tree and tree_text:
+    parsed_tree = Convert(string = tree_text).to_tree()
+    image = t.save_tree(parsed_tree, f)
 
-    for i in range(100):
-        latest_iteration.text(f'{i+1}% complete...')
-        bar.progress(i + 1)
+    if progress_bar: # stalling
+        latest_iteration = st.empty()
+        bar = st.progress(0)
+        sleep_time = 0.05
 
-        if (i == 10):
-            sleep_time = 0.01
+        for i in range(100):
+            latest_iteration.text(f'{i+1}% complete...')
+            bar.progress(i + 1)
 
-        # if (i == 70):
-        #     sleep_time = 0.02
+            if (i == 10):
+                sleep_time = 0.01
 
-        if (i == 90):
-            sleep_time = 0.05
+            if (i == 90):
+                sleep_time = 0.05
 
-        if (i == 95):
-            sleep_time = 0.1
+            if (i == 95):
+                sleep_time = 0.1
 
-        # print(sleep_time)
-        sleep(sleep_time)
-        if (i > 40 and i < 80):
-            i += 1
+            sleep(sleep_time)
+            if (i > 40 and i < 80):
+                i += 1
+
+        # st.balloons() # maybeeee
 
 
-
-        
-    st.balloons()
+    # update the onscreen graphic
+    st_show_tree(f)
     st.success("Your tree has been generated!")
 
-# now run me as
+    # provide download button
+    with open(f, "rb") as file:
+        if file:
+            btn = st.download_button(
+                label="Download tree",
+                data=file,
+                file_name= filename_for_download(),
+                mime="image/png"
+            ) # todo: use a container so that it's side by side with the generate button
+
+        
+
+# now run this as:
 # streamlit run this_file_path
 # (from root of repository, as that's where paths are relative to)
 
-            
+# todo: handle invalid input gracefully
