@@ -27,8 +27,8 @@ sample = """[IP
         [I will]
         [VP [V be] [P here]]]]"""
 
+sample_file = "default.png"
 outfile = "out.png"
-
 
 def create_tree (s):
     pr = p.parse(s)

@@ -11,6 +11,7 @@ import tree_utils as t
 
 parent_dir = 'out/'
 f = parent_dir + t.outfile
+sample_f = parent_dir + t.sample_file
 h = "pytree — Syntax Tree Generator"
 
 st.set_page_config(
@@ -23,29 +24,32 @@ st.header(h)
 tree_graphic = st.empty() # placeholder that will be filled with the auto-updating tree
 
 
-def default_tree (filename = parent_dir + t.outfile):
+def default_tree (filename = sample_f):
     tree = t.create_tree(t.sample)
     image = t.save_tree(tree, filename)
-    # image.show()
-    # t.save_tree(tree, filename)
     return filename
 
-def gen_tree_if_not_exists (fname = parent_dir + t.outfile):
+def gen_default_tree_if_not_exists (fname = sample_f):
     if not(exists(fname)):
         default_tree(fname)
     
 
-def st_show_tree (fname = parent_dir + t.outfile, tree_container = tree_graphic):
-    gen_tree_if_not_exists(fname)
+def st_show_tree (fname = sample_f, tree_container = tree_graphic):
+    # # hide the tree for now
+    # tree_container.empty()
+
+    # make sure we at least have the default
+    if fname == sample_f:
+        gen_default_tree_if_not_exists(fname)
 
     if exists(fname):
         with open(fname, "rb") as file:
             with tree_container.container():
-                st.image(f)
-
+                st.image(fname)
     else:
         st.warning("Error showing tree image!")
-        
+
+
 def filename_for_download (filename_prefix = 'tree', filetype = 'png'):
     date_exp = "%Y-%m-%d_%H:%M:%S"
     now = datetime.now()
@@ -54,7 +58,7 @@ def filename_for_download (filename_prefix = 'tree', filetype = 'png'):
 
 
 # now run streamlit s.t. you see the image!
-st_show_tree(f)
+st_show_tree() # shows default image
 
 # https://docs.streamlit.io/library/api-reference/widgets/st.text_area
 tree_text = st.text_area(label = "Enter your tree here:",
@@ -88,37 +92,45 @@ generate_tree = btn_generate_tree(left_button)
 
 
 if generate_tree and tree_text:
+    # hide the tree for now
+    tree_graphic.empty()
+
     try:
+        with tree_graphic.empty():
+            if progress_bar: # stalling
+                parsed_tree = Convert(string = tree_text).to_tree()
+                image = t.save_tree(parsed_tree, f)
 
-        parsed_tree = Convert(string = tree_text).to_tree()
-        image = t.save_tree(parsed_tree, f)
+                latest_iteration = st.empty()
+                bar = st.progress(0)
+                sleep_time = 0.05
 
-        if progress_bar: # stalling
-            latest_iteration = st.empty()
-            bar = st.progress(0)
-            sleep_time = 0.05
+                for i in range(100):
+                    latest_iteration.text(f'{i+1}% complete...')
+                    bar.progress(i + 1)
 
-            for i in range(100):
-                latest_iteration.text(f'{i+1}% complete...')
-                bar.progress(i + 1)
+                    if (i == 10):
+                        sleep_time = 0.01
 
-                if (i == 10):
-                    sleep_time = 0.01
+                    if (i == 90):
+                        sleep_time = 0.05
 
-                if (i == 90):
-                    sleep_time = 0.05
+                    if (i == 95):
+                        sleep_time = 0.1
 
-                if (i == 95):
-                    sleep_time = 0.1
+                    sleep(sleep_time)
+                    if (i > 40 and i < 80):
+                        i += 1
 
-                sleep(sleep_time)
-                if (i > 40 and i < 80):
-                    i += 1
+            else:
+                with st.spinner(text="Generating your tree..."):
+                    parsed_tree = Convert(string = tree_text).to_tree()
+                    image = t.save_tree(parsed_tree, f)
 
-            # st.balloons() # maybeeee
+                # st.balloons() # maybeeee
 
 
-        # update the onscreen graphic
+                # update the onscreen graphic
         st_show_tree(f)
         st.success("Your tree has been generated!")
 
@@ -128,16 +140,9 @@ if generate_tree and tree_text:
 
     except p.ParseError:
         st.warning("It looks like that's not a valid tree! Please edit your text and try again.")
+        tree_graphic.empty()
 
 
 # now run this as:
 # streamlit run this_file_path
 # (from root of repository, as that's where paths are relative to)
-
-# todo: handle invalid input gracefully
-
-
-# todo: always start with the same image, default.png
-# (doesn't yet exist)
-
-# which should match t.sample
