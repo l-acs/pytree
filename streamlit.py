@@ -61,7 +61,7 @@ tree_text = st.text_area(label = "Enter your tree here:",
                          value = t.sample,
                          height = len(t.sample.splitlines()) * 20)
 
-progress_bar = st.checkbox("Show progress bar")
+progress_bar = st.checkbox("Show progress bar", value = True)
 left_button, right_button, _ = st.columns([1, 1, 2]) # (2)
 
 def btn_generate_tree(button_column = left_button, key = "default"):
