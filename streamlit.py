@@ -21,7 +21,7 @@ st.set_page_config(
 st.title("pytree")
 st.header(h)
 
-config = t.settings # now we just override this
+config = t.settings.copy() # now we just override this
 tree_graphic = st.empty() # placeholder that will be filled with the auto-updating tree
 
 
@@ -72,25 +72,18 @@ show_advanced_features = st.checkbox("Show advanced features")
 
 # default settings:
 progress_bar = True
-# tree_width = t.settings["default_width"] # no longer needed
-# "font" : ImageFont.truetype('FreeMono.ttf', 60),
-# "margin" : 50, # unused, todo
-# "padding" : 20, # unused, todo
-# "line_color" : (0, 0, 0),
-# "thickness" : 4,
-# "line_height" : 100,
-
-# "default_width" : 350,     # width of top-level tree
-
-# "size_test_W" : 10000,
-# "size_test_H" : 10000,
-# "W" : start_W, # whole image's width
-# "H" : start_H, # whole image's height
-# "coord" : (start_W / 2, 50) # starting coordinate (root node)
 
 
 if show_advanced_features:
-    config["default_width"] = st.slider("Width in pixels of top-level (highest) branch",100,800, t.settings["default_width"])
+    config["default_width"] = st.slider("Width in pixels of top-level (highest) branch:",100,1500, t.settings["default_width"])    
+    config["line_height"] = st.slider("Height in pixels between each layer:", 25, 300, t.settings["line_height"])
+
+    config["font_size"] = 8 * st.number_input('Choose font size:', min_value=8, max_value=50)
+    config["line_color"] = st.color_picker('Pick line and text color:', t.settings["line_color"])
+
+
+    config["W"] = st.slider('Full image width in pixels:', 350, t.settings["W"] * 3, t.settings["W"] )
+    config["H"] = st.slider('Full image height in pixels:', 350, t.settings["H"] * 3, t.settings["H"])
     
 
     progress_bar = st.checkbox("Show progress bar", value = True)

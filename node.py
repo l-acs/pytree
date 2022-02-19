@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 # from pprint import pprint
 from draw import TextDraw, LineDraw, settings
 from pprint import pprint

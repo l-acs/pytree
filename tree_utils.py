@@ -8,11 +8,11 @@ from PIL import Image
 import os
 
 
-def fresh(): # get new image w/ default size etc
+def fresh(cfg = settings): # get new image w/ default size etc
     return Image.new("RGBA",(settings["W"], settings["H"]),"white") # random
 
 
-image = fresh()
+# image = fresh()
 
 sample = """[IP
    [NP 
@@ -34,7 +34,7 @@ def create_tree (s): # this is the only one that SHOULDNT need cfg!
 
 
 def draw_tree (tree, cfg = settings):
-    i = fresh()
+    i = fresh(cfg)
     tree.draw_node(i, cfg)
     return i
 

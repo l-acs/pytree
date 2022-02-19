@@ -1,23 +1,24 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageColor
 from pprint import pprint
 
-start_W, start_H = 2500, 1000
+start_W, start_H = 3000, 2000
 
 settings = {
-    "font" : ImageFont.truetype('FreeMono.ttf', 60),
+    "font_style" : 'FreeMono.ttf',
+    "font_size" : 80,
+    "line_color" : '#000000',
+    "thickness" : 4,
+
     "margin" : 50, # unused, todo
     "padding" : 20, # unused, todo
-    "line_color" : (0, 0, 0),
-    "thickness" : 4,
-    "line_height" : 100,
-
-    "default_width" : 350,     # width of top-level tree
+    "line_height" : int(start_H / 10),
+    "default_width" : int(start_W * 0.2),     # width of top-level tree
 
     "size_test_W" : 10000,
     "size_test_H" : 10000,
     "W" : start_W, # whole image's width
     "H" : start_H, # whole image's height
-    "coord" : (start_W / 2, 50) # starting coordinate (root node)
+    "coord" : (int(start_W / 2), 50) # starting coordinate (root node)
 }
 
 
@@ -34,7 +35,8 @@ class TextDraw:
         i = Image.new("RGBA",(size_test_W, size_test_H),"white") # random
         d = ImageDraw.Draw(i)
 
-        (w, h) = d.textsize(text, font = self.cfg["font"])
+        self.font = ImageFont.truetype(self.cfg["font_style"], self.cfg["font_size"])
+        (w, h) = d.textsize(text, font = self.font)
 
         self.size = (w, h)
 
@@ -62,7 +64,12 @@ class TextDraw:
 
         d = ImageDraw.Draw(image)
 
-        d.text(top_left, self.text, font = self.cfg["font"], fill = self.cfg["line_color"])
+        print(self.cfg["line_color"])
+
+        d.text(top_left,
+               self.text,
+               font = self.font,
+               fill = ImageColor.getrgb(self.cfg["line_color"]))
 
 
         return self.get_coord_below(coord)
@@ -103,16 +110,24 @@ class LineDraw:
 
     def draw_line (self, image):
         d = ImageDraw.Draw(image)
-        d.line([self.top_point, self.bottom_point], fill = self.cfg["line_color"], width = self.cfg["thickness"])
+        print(self.cfg["line_color"])
+
+        d.line([self.top_point, self.bottom_point],
+               fill = ImageColor.getrgb(self.cfg["line_color"]),
+               width = self.cfg["thickness"])
+
         return self.bottom_point
 
 
 
     def draw_triangle (self, image):
         d = ImageDraw.Draw(image)
-        d.line([self.top_point, self.bottom_point], fill = self.cfg["line_color"], width = self.cfg["thickness"])
-        d.line([self.top_point, self.bottom_point_opposite], fill = self.cfg["line_color"], width = self.cfg["thickness"])
-        d.line([self.bottom_point, self.bottom_point_opposite], fill = self.cfg["line_color"], width = self.cfg["thickness"])
+        fill_color = ImageColor.getrgb(self.cfg["line_color"])
+        thickness = self.cfg["thickness"]
+
+        d.line([self.top_point, self.bottom_point], fill_color, width = thickness)
+        d.line([self.top_point, self.bottom_point_opposite], fill = fill_color, width = thickness)
+        d.line([self.bottom_point, self.bottom_point_opposite], fill = fill_color, width = thickness)
 
         # return the *center* of the bottom line
         (top_x, top_y) = self.top_point
