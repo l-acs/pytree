@@ -15,14 +15,10 @@ class Node:
         self.children = children # themselves just nodes!
         self.is_triangle = is_triangle
         self.child_count = len(children)
-        # self.horizontal_space = 200 * self.child_count # todo: possibly parameterize, or, better, calculate based on text sizes
 
-    def count_all_terminal_children (self):
-        if self.child_count == 0:
-            return 1
-        else:
-            return sum([immediate_child.count_all_terminal_children() for immediate_child in self.children])
-            # maybe memoize
+        self.all_terminal_children_count = 1 \
+            if self.child_count == 0 \
+               else sum([immediate_child.all_terminal_children_count for immediate_child in self.children])
 
     def display(self): # for testing, basically
         pprint(self.text)
@@ -34,7 +30,6 @@ class Node:
 
 
     def draw_node (self, image, cfg = settings, coord = None, width = None):
-        # todo: figure out where/how d_x comes into play
 
         if width == None:
             width = cfg["default_width"]
@@ -59,7 +54,7 @@ class Node:
 
             # now, connect if applicable
             if (self.is_triangle): # draw a triangle
-              d_x = width # super arbitrary, todo: fix
+              d_x = width
 
               d_y = cfg["line_height"]
 
@@ -109,14 +104,16 @@ class Node:
             # right:
             line_right = LineDraw(acc_coord, d_x, d_y)
             acc_coord_right = line_right.draw_line(image)
-
-
+            
+            left = self.children[0]
+            right = self.children[1]
+            
             # recurse
-            self.children[0].draw_node(image, cfg, acc_coord_left, width / 2) # todo: figure out x-axis movement
-            self.children[1].draw_node(image, cfg, acc_coord_right, width / 2) # todo: figure out x-axis movement
+            left.draw_node(image, cfg, acc_coord_left,
+                           width * (left.all_terminal_children_count) / self.all_terminal_children_count)
 
-
+            right.draw_node(image, cfg, acc_coord_right,
+                           width * (right.all_terminal_children_count) / self.all_terminal_children_count)
 
 
         return acc_coord
-
