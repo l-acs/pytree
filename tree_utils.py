@@ -1,18 +1,15 @@
 from parse import Parse as p
 from convert import Convert
 
-from node import TextDraw, LineDraw, line_height, default_width, margin, padding
+from node import TextDraw, LineDraw, settings
 
 
 from PIL import Image
 import os
 
 
-W, H = 2500, 1000
-coord = (W/2, 50)
-
 def fresh(): # get new image w/ default size etc
-    return Image.new("RGBA",(W,H),"white") # random
+    return Image.new("RGBA",(settings["W"], settings["H"]),"white") # random
 
 
 image = fresh()
@@ -30,27 +27,20 @@ sample = """[IP
 sample_file = "default.png"
 outfile = "out.png"
 
-def create_tree (s):
+def create_tree (s): # this is the only one that SHOULDNT need cfg!
     pr = p.parse(s)
     tree = Convert(parse_results = pr).to_tree()
     return tree
 
 
-def draw_tree (tree, width = default_width):
+def draw_tree (tree, cfg = settings):
     i = fresh()
-    tree.draw_node(i, coord, width)
+    tree.draw_node(i, cfg)
     return i
 
-def save_tree (tree, filename = outfile, width = default_width):
-    i = draw_tree(tree, width)
+def save_tree (tree, filename = outfile, cfg = settings):
+    i = draw_tree(tree, cfg)
     i.save(filename)
     return i
     # return filename
-
-def show_tree (tree, width = default_width):
-    # not useful. for testing
-    i = draw_tree(tree, width)
-    i.show()
-
-
 

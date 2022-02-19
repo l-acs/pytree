@@ -1,17 +1,11 @@
-# goal:
-# go from
-# [XP
-#    [X'
-#        [YP [Y' [Y your] [ZP [Z' [Z word]]]]]
-#    ]
-# ]
-
-# to a tree
-# etc.
+# goal: go from
+# [XP [X' [YP [Y' [Y your] [ZP [Z' [Z word]]]]]]]
+# to a tree. Etc.
 
 import sys
 from parse import Parse as p
-from node import Node
+from node import Node, settings
+
 
 # # okay, now link up node and ParseResults
 # cases to handle

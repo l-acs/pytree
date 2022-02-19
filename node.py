@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 # from pprint import pprint
-from draw import TextDraw, LineDraw, line_height, default_width, margin, padding
+from draw import TextDraw, LineDraw, settings
 from pprint import pprint
 
 connect_categories_and_words = False
@@ -10,10 +10,11 @@ connect_categories_and_words = False
 # (it goes directly from its branch down through the middle of the category and up until the terminal text )
 
 class Node:
-    def __init__ (self, text, children = [], is_triangle = False):
+    def __init__ (self, text, children = [], is_triangle = False, cfg = settings): #todo remove cfg here
         self.text = text
         self.children = children # themselves just nodes!
         self.is_triangle = is_triangle
+        # self.cfg = cfg # commented out as a quick way to see if you can just remove it
         self.child_count = len(children)
         # self.horizontal_space = 200 * self.child_count # todo: possibly parameterize, or, better, calculate based on text sizes
 
@@ -27,12 +28,18 @@ class Node:
         print('---' * 20)
 
 
-    def draw_node (self, image, coord, width=default_width):
+    def draw_node (self, image, cfg = settings, coord = None, width = None):
         # todo: figure out where/how d_x comes into play
+
+        if width == None:
+            width = cfg["default_width"]
+
+        if coord == None:
+            coord = cfg["coord"]
 
         td = TextDraw(self.text)
         acc_coord = td.draw(image, coord) # just start by drawing the text
-
+        
         
         if (self.child_count == 0):
             return acc_coord # done
@@ -49,7 +56,7 @@ class Node:
             if (self.is_triangle): # draw a triangle
               d_x = width # super arbitrary, todo: fix
 
-              d_y = line_height
+              d_y = cfg["line_height"]
 
               line = LineDraw(acc_coord, d_x, d_y)
               acc_coord = line.draw_triangle(image)
@@ -58,7 +65,7 @@ class Node:
 
             elif (connect_categories_and_words): # draw a line
               d_x = 0 # straight line down, so no change in x
-              d_y = line_height
+              d_y = cfg["line_height"]
 
               line = LineDraw(coord, d_x, d_y)
               acc_coord = line.draw_line(image)
@@ -71,13 +78,13 @@ class Node:
         elif (self.child_count == 1): # one child with its own children
             # draw left
             d_x = 0 # straight line down, so no change in x
-            d_y = line_height
+            d_y = cfg["line_height"]
             
             line = LineDraw(acc_coord, d_x, d_y)
             acc_coord = line.draw_line(image)
 
             # recurse
-            self.children[0].draw_node(image, acc_coord, width / 2)
+            self.children[0].draw_node(image, cfg, acc_coord, width / 2)
                         
 
         else: # this means there's complex children
@@ -87,7 +94,7 @@ class Node:
 
             # draw left
             d_x = width
-            d_y = line_height
+            d_y = cfg["line_height"]
             
             # left:
             line_left = LineDraw(acc_coord, -1 * d_x, d_y)
@@ -99,8 +106,8 @@ class Node:
 
 
             # recurse
-            self.children[0].draw_node(image, acc_coord_left, width / 2) # todo: figure out x-axis movement
-            self.children[1].draw_node(image, acc_coord_right, width / 2) # todo: figure out x-axis movement
+            self.children[0].draw_node(image, cfg, acc_coord_left, width / 2) # todo: figure out x-axis movement
+            self.children[1].draw_node(image, cfg, acc_coord_right, width / 2) # todo: figure out x-axis movement
 
 
 

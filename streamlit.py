@@ -21,6 +21,7 @@ st.set_page_config(
 st.title("pytree")
 st.header(h)
 
+config = t.settings # now we just override this
 tree_graphic = st.empty() # placeholder that will be filled with the auto-updating tree
 
 
@@ -71,11 +72,27 @@ show_advanced_features = st.checkbox("Show advanced features")
 
 # default settings:
 progress_bar = True
-tree_width = t.default_width
+# tree_width = t.settings["default_width"] # no longer needed
+# "font" : ImageFont.truetype('FreeMono.ttf', 60),
+# "margin" : 50, # unused, todo
+# "padding" : 20, # unused, todo
+# "line_color" : (0, 0, 0),
+# "thickness" : 4,
+# "line_height" : 100,
+
+# "default_width" : 350,     # width of top-level tree
+
+# "size_test_W" : 10000,
+# "size_test_H" : 10000,
+# "W" : start_W, # whole image's width
+# "H" : start_H, # whole image's height
+# "coord" : (start_W / 2, 50) # starting coordinate (root node)
 
 
 if show_advanced_features:
-    tree_width = st.slider("Width in pixels of top-level (highest) branch",100,800, tree_width)
+    config["default_width"] = st.slider("Width in pixels of top-level (highest) branch",100,800, t.settings["default_width"])
+    
+
     progress_bar = st.checkbox("Show progress bar", value = True)
 
 
@@ -113,7 +130,7 @@ if generate_tree and tree_text:
         with tree_graphic.empty():
             if progress_bar: # stalling
                 parsed_tree = Convert(string = tree_text).to_tree()
-                image = t.save_tree(parsed_tree, f, tree_width)
+                image = t.save_tree(parsed_tree, f, cfg=config)
 
                 latest_iteration = st.empty()
                 bar = st.progress(0)
@@ -139,7 +156,7 @@ if generate_tree and tree_text:
             else:
                 with st.spinner(text="Generating your tree..."):
                     parsed_tree = Convert(string = tree_text).to_tree()
-                    image = t.save_tree(parsed_tree, f, tree_width)
+                    image = t.save_tree(parsed_tree, f, cfg = config)
 
                 # st.balloons() # maybeeee
 
