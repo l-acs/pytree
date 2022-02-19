@@ -1,8 +1,8 @@
-import sys
-# temporarily
-sys.path.append("/home/l-acs/projects/python/pytree")
 from parse import Parse as p
 from convert import Convert
+
+from node import TextDraw, LineDraw, line_height, default_width, margin, padding
+
 
 from PIL import Image
 import os
@@ -36,20 +36,20 @@ def create_tree (s):
     return tree
 
 
-def draw_tree (tree):
+def draw_tree (tree, width = default_width):
     i = fresh()
-    tree.draw_node(i, coord)
+    tree.draw_node(i, coord, width)
     return i
 
-def save_tree (tree, filename = outfile):
-    i = draw_tree(tree)
+def save_tree (tree, filename = outfile, width = default_width):
+    i = draw_tree(tree, width)
     i.save(filename)
     return i
     # return filename
 
-def show_tree (tree):
+def show_tree (tree, width = default_width):
     # not useful. for testing
-    i = draw_tree(tree)
+    i = draw_tree(tree, width)
     i.show()
 
 

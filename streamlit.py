@@ -65,7 +65,21 @@ tree_text = st.text_area(label = "Enter your tree here:",
                          value = t.sample,
                          height = len(t.sample.splitlines()) * 20)
 
-progress_bar = st.checkbox("Show progress bar", value = True)
+
+# put advanced features here
+show_advanced_features = st.checkbox("Show advanced features")
+
+# default settings:
+progress_bar = True
+tree_width = t.default_width
+
+
+if show_advanced_features:
+    tree_width = st.slider("Width in pixels of top-level (highest) branch",100,800, tree_width)
+    progress_bar = st.checkbox("Show progress bar", value = True)
+
+
+
 left_button, right_button, _ = st.columns([1, 1, 2]) # (2)
 
 def btn_generate_tree(button_column = left_button, key = "default"):
@@ -99,7 +113,7 @@ if generate_tree and tree_text:
         with tree_graphic.empty():
             if progress_bar: # stalling
                 parsed_tree = Convert(string = tree_text).to_tree()
-                image = t.save_tree(parsed_tree, f)
+                image = t.save_tree(parsed_tree, f, tree_width)
 
                 latest_iteration = st.empty()
                 bar = st.progress(0)
@@ -125,7 +139,7 @@ if generate_tree and tree_text:
             else:
                 with st.spinner(text="Generating your tree..."):
                     parsed_tree = Convert(string = tree_text).to_tree()
-                    image = t.save_tree(parsed_tree, f)
+                    image = t.save_tree(parsed_tree, f, tree_width)
 
                 # st.balloons() # maybeeee
 

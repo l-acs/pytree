@@ -18,6 +18,8 @@ thickness = 4
 # only used in a couple of places in Node; so far an actual parameter is taken
 line_height = 100
 
+# width of top-level tree
+default_width = 300
 
 
 

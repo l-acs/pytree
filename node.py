@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 # from pprint import pprint
-from draw import TextDraw, LineDraw, line_height, margin, padding
+from draw import TextDraw, LineDraw, line_height, default_width, margin, padding
 from pprint import pprint
 
 connect_categories_and_words = False
@@ -9,15 +9,13 @@ connect_categories_and_words = False
 # when True, the line cuts through the category
 # (it goes directly from its branch down through the middle of the category and up until the terminal text )
 
-default_width = 300
-
 class Node:
     def __init__ (self, text, children = [], is_triangle = False):
         self.text = text
         self.children = children # themselves just nodes!
         self.is_triangle = is_triangle
         self.child_count = len(children)
-        self.horizontal_space = 200 * self.child_count # todo: possibly parameterize, or, better, calculate based on text sizes
+        # self.horizontal_space = 200 * self.child_count # todo: possibly parameterize, or, better, calculate based on text sizes
 
 
     def display(self): # for testing, basically
