@@ -10,14 +10,19 @@ connect_categories_and_words = False
 # (it goes directly from its branch down through the middle of the category and up until the terminal text )
 
 class Node:
-    def __init__ (self, text, children = [], is_triangle = False, cfg = settings): #todo remove cfg here
+    def __init__ (self, text, children = [], is_triangle = False):
         self.text = text
         self.children = children # themselves just nodes!
         self.is_triangle = is_triangle
-        # self.cfg = cfg # commented out as a quick way to see if you can just remove it
         self.child_count = len(children)
         # self.horizontal_space = 200 * self.child_count # todo: possibly parameterize, or, better, calculate based on text sizes
 
+    def count_all_terminal_children (self):
+        if self.child_count == 0:
+            return 1
+        else:
+            return sum([immediate_child.count_all_terminal_children() for immediate_child in self.children])
+            # maybe memoize
 
     def display(self): # for testing, basically
         pprint(self.text)
@@ -84,7 +89,8 @@ class Node:
             acc_coord = line.draw_line(image)
 
             # recurse
-            self.children[0].draw_node(image, cfg, acc_coord, width / 2)
+            self.children[0].draw_node(image, cfg, acc_coord, width) # width / 2)
+            # see what happens if we don't reduce width of non-branching children
                         
 
         else: # this means there's complex children

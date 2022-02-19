@@ -34,6 +34,7 @@ def create_tree (s): # this is the only one that SHOULDNT need cfg!
 
 
 def draw_tree (tree, cfg = settings):
+    print(f"This tree has {tree.count_all_terminal_children()} terminal children")
     i = fresh(cfg)
     tree.draw_node(i, cfg)
     return i

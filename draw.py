@@ -64,7 +64,7 @@ class TextDraw:
 
         d = ImageDraw.Draw(image)
 
-        print(self.cfg["line_color"])
+        # print(self.cfg["line_color"])
 
         d.text(top_left,
                self.text,
@@ -110,7 +110,7 @@ class LineDraw:
 
     def draw_line (self, image):
         d = ImageDraw.Draw(image)
-        print(self.cfg["line_color"])
+        # print(self.cfg["line_color"])
 
         d.line([self.top_point, self.bottom_point],
                fill = ImageColor.getrgb(self.cfg["line_color"]),
