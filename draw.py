@@ -11,7 +11,8 @@ settings = {
     "thickness" : 4,
 
     "margin" : 50, # unused, todo
-    "padding" : 20, # unused, todo
+    "top_padding" : 15, # between a parent node and its branch(es)
+    "bottom_padding" : 15, # between a branch and the child
     "line_height" : int(start_H / 10),
     "default_width" : int(start_W * 0.2),     # width of top-level tree
 

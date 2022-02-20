@@ -9,6 +9,12 @@ connect_categories_and_words = False
 # when True, the line cuts through the category
 # (it goes directly from its branch down through the middle of the category and up until the terminal text )
 
+def pad_coord (coord, pad_x = 0, pad_y = 0):
+    x, y = coord
+    return (x + pad_x, y + pad_y)
+
+
+
 class Node:
     def __init__ (self, text, children = [], is_triangle = False):
         self.text = text
@@ -35,17 +41,25 @@ class Node:
             width = cfg["default_width"]
 
         if coord == None:
-            coord = cfg["coord"]
+            coord = cfg["coord"] # this means it's the first call!
+
+        else: # it's not the first call, and we should pad it (because i.e. there's a line before it)
+            coord = pad_coord(coord, pad_y = cfg["bottom_padding"])
 
         td = TextDraw(self.text, cfg)
-        acc_coord = td.draw(image, coord) # just start by drawing the text
+
+
+        # just start by drawing the text
+        acc_coord = td.draw(image, coord)
+
+        # now pad before the lines (after the text we just wrote)
+        # i.e. add padding between parent node's text and its branches
+        acc_coord = pad_coord(acc_coord, pad_y = cfg["top_padding"])
         
         
-        if (self.child_count == 0):
+        if (self.child_count == 0): # it's terminal
             return acc_coord # done
 
-            # td.draw(image, coord)
-        # elif
         elif ((self.child_count == 1 and self.children[0].child_count == 0) or self.is_triangle):
             # there's this node and one more, and the next node is terminal
             # this means that this node is a category and the other node is text
@@ -62,7 +76,6 @@ class Node:
               acc_coord = line.draw_triangle(image)
 
 
-
             elif (connect_categories_and_words): # draw a line
               d_x = 0 # straight line down, so no change in x
               d_y = cfg["line_height"]
@@ -73,7 +86,12 @@ class Node:
             # now draw the subsequent text
             text = ' '.join([child.text for child in self.children])
             td = TextDraw(text, cfg) # does this need to be a new one?
-            acc_coord = td.draw(image, acc_coord)
+
+            # now draw the text, padded
+            acc_coord = td.draw(image, pad_coord(acc_coord, pad_y = cfg["bottom_padding"]))
+            # bottom because we just drew a line
+
+            # it only gets reassigned for the sake of the return value
 
         elif (self.child_count == 1): # one child with its own children
             # draw left
@@ -84,8 +102,7 @@ class Node:
             acc_coord = line.draw_line(image)
 
             # recurse
-            self.children[0].draw_node(image, cfg, acc_coord, width) # width / 2)
-            # see what happens if we don't reduce width of non-branching children
+            self.children[0].draw_node(image, cfg, acc_coord, width)
                         
 
         else: # this means there's complex children
@@ -116,4 +133,4 @@ class Node:
                            width * (right.all_terminal_children_count) / self.all_terminal_children_count)
 
 
-        return acc_coord
+        return acc_coord # not sure this matters
