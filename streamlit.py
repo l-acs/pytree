@@ -85,6 +85,13 @@ if show_advanced_features:
     config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=50, value = 24)
     config["line_color"] = st.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
 
+    config["top_padding"] = st.slider("Padding between parent node and the line(s) below it:",
+                                      0, 40, value = t.settings["top_padding"])
+
+    config["bottom_padding"] = st.slider("Padding between a line and the node underneath:",
+                                      0, 40, value = t.settings["bottom_padding"])
+
+
     config["W"] = st.slider('Full image width in pixels:', 350, t.settings["W"] * 3, t.settings["W"] )
     config["H"] = st.slider('Full image height in pixels:', 350, t.settings["H"] * 3, t.settings["H"])
     
