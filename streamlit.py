@@ -2,7 +2,7 @@
 import streamlit as st
 from time import sleep
 from datetime import datetime
-from os.path import exists
+import os
 
 from parse import Parse as p
 from convert import Convert
@@ -31,7 +31,7 @@ def default_tree (filename = sample_f):
     return filename
 
 def gen_default_tree_if_not_exists (fname = sample_f):
-    if not(exists(fname)):
+    if not(os.path.exists(fname)):
         default_tree(fname)
     
 
@@ -43,7 +43,7 @@ def st_show_tree (fname = sample_f, tree_container = tree_graphic):
     if fname == sample_f:
         gen_default_tree_if_not_exists(fname)
 
-    if exists(fname):
+    if os.path.exists(fname):
         with open(fname, "rb") as file:
             with tree_container.container():
                 st.image(fname)
@@ -78,9 +78,11 @@ if show_advanced_features:
     config["default_width"] = st.slider("Width in pixels of top-level (highest) branch:",100,1500, t.settings["default_width"])    
     config["line_height"] = st.slider("Height in pixels between each layer:", 25, 300, t.settings["line_height"])
 
-    config["font_size"] = 8 * st.number_input('Choose font size:', min_value=8, max_value=50)
-    config["line_color"] = st.color_picker('Pick line and text color:', t.settings["line_color"])
+    config["font_style"] = st.selectbox('Select a font:',
+                                        [font_file.split('.')[0] for font_file in os.listdir('fonts/')])
 
+    config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=50, value = 24)
+    config["line_color"] = st.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
 
     config["W"] = st.slider('Full image width in pixels:', 350, t.settings["W"] * 3, t.settings["W"] )
     config["H"] = st.slider('Full image height in pixels:', 350, t.settings["H"] * 3, t.settings["H"])

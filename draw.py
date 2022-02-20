@@ -2,9 +2,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageColor
 from pprint import pprint
 
 start_W, start_H = 3000, 2000
+font_dir = "fonts/"
 
 settings = {
-    "font_style" : 'FreeMono.ttf',
+    "font_style" : 'FreeMono', # 'Swansea',
     "font_size" : 80,
     "line_color" : '#000000',
     "thickness" : 4,
@@ -35,7 +36,7 @@ class TextDraw:
         i = Image.new("RGBA",(size_test_W, size_test_H),"white") # random
         d = ImageDraw.Draw(i)
 
-        self.font = ImageFont.truetype(self.cfg["font_style"], self.cfg["font_size"])
+        self.font = ImageFont.truetype(font_dir + self.cfg["font_style"] + '.ttf', self.cfg["font_size"])
         (w, h) = d.textsize(text, font = self.font)
 
         self.size = (w, h)

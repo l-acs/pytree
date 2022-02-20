@@ -37,7 +37,7 @@ class Node:
         if coord == None:
             coord = cfg["coord"]
 
-        td = TextDraw(self.text)
+        td = TextDraw(self.text, cfg)
         acc_coord = td.draw(image, coord) # just start by drawing the text
         
         
@@ -58,7 +58,7 @@ class Node:
 
               d_y = cfg["line_height"]
 
-              line = LineDraw(acc_coord, d_x, d_y)
+              line = LineDraw(acc_coord, d_x, d_y, cfg)
               acc_coord = line.draw_triangle(image)
 
 
@@ -67,12 +67,12 @@ class Node:
               d_x = 0 # straight line down, so no change in x
               d_y = cfg["line_height"]
 
-              line = LineDraw(coord, d_x, d_y)
+              line = LineDraw(coord, d_x, d_y, cfg)
               acc_coord = line.draw_line(image)
 
             # now draw the subsequent text
             text = ' '.join([child.text for child in self.children])
-            td = TextDraw(text) # does this need to be a new one?
+            td = TextDraw(text, cfg) # does this need to be a new one?
             acc_coord = td.draw(image, acc_coord)
 
         elif (self.child_count == 1): # one child with its own children
@@ -80,7 +80,7 @@ class Node:
             d_x = 0 # straight line down, so no change in x
             d_y = cfg["line_height"]
             
-            line = LineDraw(acc_coord, d_x, d_y)
+            line = LineDraw(acc_coord, d_x, d_y, cfg)
             acc_coord = line.draw_line(image)
 
             # recurse
@@ -98,11 +98,11 @@ class Node:
             d_y = cfg["line_height"]
             
             # left:
-            line_left = LineDraw(acc_coord, -1 * d_x, d_y)
+            line_left = LineDraw(acc_coord, -1 * d_x, d_y, cfg)
             acc_coord_left = line_left.draw_line(image)
 
             # right:
-            line_right = LineDraw(acc_coord, d_x, d_y)
+            line_right = LineDraw(acc_coord, d_x, d_y, cfg)
             acc_coord_right = line_right.draw_line(image)
             
             left = self.children[0]
