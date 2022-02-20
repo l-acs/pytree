@@ -23,7 +23,8 @@ st.header(h)
 
 config = t.settings.copy() # now we just override this
 tree_graphic = st.empty() # placeholder that will be filled with the auto-updating tree
-
+fonts = [font_file.split('.')[0] for font_file in os.listdir('fonts/')]
+fonts.sort()
 
 def default_tree (filename = sample_f):
     tree = t.create_tree(t.sample)
@@ -79,7 +80,7 @@ if show_advanced_features:
     config["line_height"] = st.slider("Height in pixels between each layer:", 25, 300, t.settings["line_height"])
 
     config["font_style"] = st.selectbox('Select a font:',
-                                        [font_file.split('.')[0] for font_file in os.listdir('fonts/')])
+                                        fonts)
 
     config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=50, value = 24)
     config["line_color"] = st.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)

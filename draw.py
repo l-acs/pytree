@@ -5,7 +5,7 @@ start_W, start_H = 3000, 2000
 font_dir = "fonts/"
 
 settings = {
-    "font_style" : 'FreeMono', # 'Swansea',
+    "font_style" : 'FreeMono',
     "font_size" : 80,
     "line_color" : '#000000',
     "thickness" : 4,
