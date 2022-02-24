@@ -26,12 +26,10 @@ class Node:
             if self.child_count == 0 \
                else sum([immediate_child.all_terminal_children_count for immediate_child in self.children])
 
-    def display(self): # for testing, basically
-        pprint(self.text)
-        print("Triangle? " + str(self.is_triangle))
-        print("I have " + str(self.child_count) + " immediate child(ren): ")
+    def display(self, indent = ''): # for testing, basically
+        print(indent + self.text + " has " + str(self.child_count) + " immediate child(ren)." + "Triangle?" + str(self.is_triangle))
         for child in self.children:
-            child.display()
+            child.display(indent + ' ' * 4)
         print('---' * 20)
 
 
