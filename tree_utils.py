@@ -18,7 +18,7 @@ sample = """[IP
    [NP 
         [DP [D the] [D 30]]
         [N'
-            [AdjP very big]
+            <AdjP very big>
             [N dogs]]]
    [I'
         [I will]
