@@ -12,12 +12,15 @@ from node import Node, settings
 def leaf (text): # takes no children
     return Node(text)
 
+# the issue:
+# it's the case that any text item in a list _must_ be a triangle
+# but it was only getting handled as a leaf
 
 def triangle (text):
     # assumes there's at least at least one space in text passed
     pieces = text.split(' ')
     category = pieces[0]
-    children_text = pieces[1:]
+    children_text = ' '.join(pieces[1:])
 
     # text_as_leaf_nodes = [leaf(word) for word in children_text]
     # return Node(category, text_as_leaf_nodes, is_triangle=True)
@@ -49,8 +52,6 @@ def handle_text(label, text):
     # handle a leaf and its label, whether that leaf is a triangle or not
 
     if is_triangle(text):
-        #        inner = triangle(text) # node
-        #        return Node(label, [inner], True)
         return triangle(text)
 
     else:
@@ -76,7 +77,7 @@ def handle_list (label, l):
 
     for item in l:
         if (type(item) == str):
-            node = leaf(item)
+            node = triangle(item) if is_triangle(item) else leaf(item)
         else:
             k, v = item.popitem()
             node = handle(k, v)
@@ -112,7 +113,6 @@ class Convert:
     # more specifically, if a would-be triangle has a sister, it isn't recognized as being a triangle
 
 def __nota_bene__():
-    from pprint import pprint
 
     def bar():
         print('- ' * 20 + '-')
@@ -141,18 +141,34 @@ def __nota_bene__():
 
 
 if __name__ == "__main__":
+    from pprint import pprint
+
     W, H = 2500, 1000
     coord = (W/2, 50)
 
     from PIL import Image
-    image = Image.new("RGBA",(W,H),"white") # random
 
-    s = "[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will    ] [VP [V be] [P here]]]]"
-    pr = p.parse(s)
+    triangle_tests = [
+        "[NP [D the] [N' <AdjP very big> [N dog]]]", # passes!
+        "[NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]]", # passes!
+        "[NP [DP [D the] [D 30]] [N' [AdjP <AdvP very very very> [A big]] [N dogs]]]", # gets cut off but I think it passes
+       # "[]", fails but that's expected
+       # "<>", fails but that's expected
+      "[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will] [VP [V be] [P here]]]]", # gets get off but I think it passes
+#        "<IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will] [VP [V be] [P here]]]>", # fails but that's expected
+        "[IP <NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]> [I' [I will] <VP [V be] [P here]>]]", # it includes the brackets, but it works!
+        "[IP <NP the 30 very big dogs> [I' [I will] <VP be here>]]"
+    ]
 
-    tree = Convert(parse_results = pr).to_tree()
+    for s in triangle_tests:
+        image = Image.new("RGBA",(W,H),"white") # random
+        print(s)
+        pr = p.parse(s)
+        pprint(pr)
 
-    tree.draw_node(image, coord)
-    image.show()
+        tree = Convert(parse_results = pr).to_tree()
+        tree.display()
+        tree.draw_node(image, coord = coord)
+        image.show()
 
     __nota_bene__()
