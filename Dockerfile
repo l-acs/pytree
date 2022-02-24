@@ -17,5 +17,4 @@ CMD ["--server.port", "8501", "./streamlit.py"]
 
 
 # docker build -t pytree .
-# docker run -p 8501:8501 pytree
-
+# docker run -d -p 8501:8501 --restart always pytree
