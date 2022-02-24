@@ -1,0 +1,11 @@
+[server]
+enableCORS = false
+enableXsrfProtection = false
+port = 8501
+baseUrlPath = "/pytree"
+
+[browser]
+# Whether to send usage statistics to Streamlit.
+# Default: true
+gatherUsageStats = false
+
