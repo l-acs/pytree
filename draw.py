@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from pprint import pprint
 
-start_W, start_H = 3000, 2000
+start_W, start_H = 3500, 2500
 font_dir = "fonts/"
 
 settings = {
