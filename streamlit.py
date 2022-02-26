@@ -72,17 +72,14 @@ tree_text = st.text_area(label = "Enter your tree here:",
 show_advanced_features = st.checkbox("Show advanced features")
 
 # default settings:
-progress_bar = True
+progress_bar = False
 
 
 if show_advanced_features:
-    config["default_width"] = st.slider("Width in pixels of top-level (highest) branch:",100,1500, t.settings["default_width"])    
-    config["line_height"] = st.slider("Height in pixels between each layer:", 25, 300, t.settings["line_height"])
-
     config["font_style"] = st.selectbox('Select a font:',
                                         fonts)
 
-    config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=50, value = 24)
+    config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=40, value = 20)
     config["line_color"] = st.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
 
     config["top_padding"] = st.slider("Padding between parent node and the line(s) below it:",
@@ -92,11 +89,11 @@ if show_advanced_features:
                                       0, 40, value = t.settings["bottom_padding"])
 
 
-    config["W"] = st.slider('Full image width in pixels:', 350, t.settings["W"] * 3, t.settings["W"] )
-    config["H"] = st.slider('Full image height in pixels:', 350, t.settings["H"] * 3, t.settings["H"])
+    config["W"] = st.slider('Full image width in pixels:', 350, 3500, t.settings["W"] )
+    config["H"] = st.slider('Full image height in pixels:', 350, 3500, t.settings["H"])
     
 
-    progress_bar = st.checkbox("Show progress bar", value = True)
+    progress_bar = st.checkbox("Show progress bar", value = False)
 
 
 
