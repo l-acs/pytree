@@ -26,6 +26,11 @@ class Node:
             if self.child_count == 0 \
                else sum([immediate_child.all_terminal_children_count for immediate_child in self.children])
 
+        # how many layers deep do I go?
+        self.number_of_generations_below = 1 \
+            if self.child_count == 0 \
+               else 1 + max([immediate_child.number_of_generations_below for immediate_child in self.children])
+
     def display(self, indent = ''): # for testing, basically
         print(indent + self.text + " has " + str(self.child_count) + " immediate child(ren)." + "Triangle?" + str(self.is_triangle))
         for child in self.children:
