@@ -16,8 +16,6 @@ settings = {
     "line_height" : int(start_H / 10),
     "default_width" : int(start_W * 0.2),     # width of top-level tree
 
-    "size_test_W" : 10000,
-    "size_test_H" : 10000,
     "W" : start_W, # whole image's width
     "H" : start_H, # whole image's height
     "coord" : (int(start_W / 2), 50) # starting coordinate (root node)
@@ -30,11 +28,9 @@ class TextDraw:
         self.text = text
         self.cfg = cfg
 
-        size_test_W = 10000
-        size_test_H = 10000
         bg = "white"
 
-        i = Image.new("RGBA",(size_test_W, size_test_H),"white") # random
+        i = Image.new("RGBA",(cfg["W"], cfg["H"]),"white")
         d = ImageDraw.Draw(i)
 
         self.font = ImageFont.truetype(font_dir + self.cfg["font_style"] + '.ttf', self.cfg["font_size"])
