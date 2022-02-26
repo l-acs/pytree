@@ -82,6 +82,8 @@ if show_advanced_features:
     config["font_size"] = 4 * st.number_input('Choose font size:', min_value=8, max_value=40, value = 20)
     config["line_color"] = st.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
 
+    config["thickness"] = st.slider('Thickness of lines:', 0, 15, t.settings["thickness"])
+
     config["top_padding"] = st.slider("Padding between parent node and the line(s) below it:",
                                       0, 40, value = t.settings["top_padding"])
 
@@ -91,7 +93,7 @@ if show_advanced_features:
 
     config["W"] = st.slider('Full image width in pixels:', 350, 3500, t.settings["W"] )
     config["H"] = st.slider('Full image height in pixels:', 350, 3500, t.settings["H"])
-    
+    config["margin"] = st.slider('Approximate margins around the tree:', 0, 100, t.settings["margin"])
 
     progress_bar = st.checkbox("Show progress bar", value = False)
 
