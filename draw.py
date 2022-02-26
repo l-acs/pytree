@@ -1,7 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from pprint import pprint
 
-start_W, start_H = 3500, 2500
 font_dir = "fonts/"
 
 settings = {
@@ -10,15 +9,14 @@ settings = {
     "line_color" : '#000000',
     "thickness" : 4,
 
-    "margin" : 50, # unused, todo
-    "top_padding" : 20, # between a parent node and its branch(es)
-    "bottom_padding" : 25, # between a branch and the child
-    "line_height" : int(start_H / 10),
-    "default_width" : int(start_W * 0.2),     # width of top-level tree
+    "margin" : 20,
+    "top_padding" : 10, # between a parent node and its branch(es)
+    "bottom_padding" : 20, # between a branch and the child
 
-    "W" : start_W, # whole image's width
-    "H" : start_H, # whole image's height
-    "coord" : (int(start_W / 2), 50) # starting coordinate (root node)
+    "W" : 3500, # whole image's width
+    "H" : 2500, # whole image's height
+    "font_max_height_in_pixels" : None, # this is for internal use; it gets set in node.py
+    "font_typical_word_width_in_pixels" : None # likewise
 }
 
 
@@ -61,8 +59,6 @@ class TextDraw:
         top_left = self.get_top_left(coord)
 
         d = ImageDraw.Draw(image)
-
-        # print(self.cfg["line_color"])
 
         d.text(top_left,
                self.text,
@@ -108,7 +104,6 @@ class LineDraw:
 
     def draw_line (self, image):
         d = ImageDraw.Draw(image)
-        # print(self.cfg["line_color"])
 
         d.line([self.top_point, self.bottom_point],
                fill = ImageColor.getrgb(self.cfg["line_color"]),

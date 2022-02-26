@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw
-# from pprint import pprint
 from draw import TextDraw, LineDraw, settings
 from pprint import pprint
 
@@ -31,6 +30,7 @@ class Node:
             if self.child_count == 0 \
                else 1 + max([immediate_child.number_of_generations_below for immediate_child in self.children])
 
+
     def display(self, indent = ''): # for testing, basically
         print(indent + self.text + " has " + str(self.child_count) + " immediate child(ren)." + "Triangle?" + str(self.is_triangle))
         for child in self.children:
@@ -38,19 +38,74 @@ class Node:
         print('---' * 20)
 
 
+    def calculate_initial_node_x (self, cfg = settings):
+        # this means it's the first call!
+        if self.child_count == 1: # since it has exactly one child, we have to check and recurse on it
+            left = self.children[0]
+            return left.calculate_initial_node_x(cfg)
+
+        # otherwise...
+        if self.child_count == 0: # edge case: this (sub)tree doesn't branch at all; we're just midway
+            return cfg["W"] / 2
+
+        else:
+            left_count = self.children[0].all_terminal_children_count
+            ratio = left_count / (self.all_terminal_children_count - left_count) # left vs non-left
+
+            drawable_x = cfg["drawable_width"] / 2
+            # print(f"The ratio is {ratio} and the margin is {cfg['margin']}; x is {drawable_x}")
+            drawable_x *= ratio
+            drawable_x += cfg["margin"] + (cfg["font_typical_word_width_in_pixels"] / 2)
+            # print("so our coordinate will be " + str(drawable_x))
+            return drawable_x
+
+
+    def determine_line_height (self, cfg = settings):
+        # set the branch height
+        full_image_height_sans_margin = cfg["H"] - (2 * cfg["margin"])
+        # print(cfg["font_max_height_in_pixels"])
+        text_height = cfg["font_max_height_in_pixels"]  + cfg["top_padding"] + cfg["bottom_padding"]
+
+        return (full_image_height_sans_margin / self.number_of_generations_below) - text_height
+
+
+    def initialize_root (self, cfg = settings):
+        # when we call draw_node on a root, we have to preprocess the tree in a sense
+
+        (cfg["font_typical_word_width_in_pixels"],
+         cfg["font_max_height_in_pixels"]) = TextDraw("LARGE TEXT", cfg).size
+
+        cfg["line_height"] = self.determine_line_height(cfg)
+        cfg["drawable_width"] = cfg["W"] - 2 * (cfg["margin"] + cfg["font_typical_word_width_in_pixels"]) # what width we can actually draw *nodes* on
+
+        return
+
+
     def draw_node (self, image, cfg = settings, coord = None, width = None):
+        # determine width of branches
+        if width == None: # this is the tree root, so let's initialize some things
+            self.initialize_root(cfg)
 
-        if width == None:
-            width = cfg["default_width"]
+            # try: take advantage of that sum thing
+            # width is the x-axis movement left or right of the first node at which our tree branches
+            full_image_width_sans_margin = cfg["drawable_width"]
+            print(f"The width the tree can fill is {full_image_width_sans_margin}")
+            width = full_image_width_sans_margin / 4
 
-        if coord == None:
-            coord = cfg["coord"] # this means it's the first call!
+            # for a rainy day, consider this:
+            # this is so close to being exactly what we want
+            # the problem is that it doesn't prevent text collsion between two nodes being too close together
+            # maybe we need to somehow set a *minimum* width
+
+
+
+        if coord == None: # first call, so we have to determine where the root should go
+            coord = (self.calculate_initial_node_x(cfg), cfg["margin"])
 
         else: # it's not the first call, and we should pad it (because i.e. there's a line before it)
             coord = pad_coord(coord, pad_y = cfg["bottom_padding"])
 
         td = TextDraw(self.text, cfg)
-
 
         # just start by drawing the text
         acc_coord = td.draw(image, coord)
@@ -81,10 +136,11 @@ class Node:
 
             elif (connect_categories_and_words): # draw a line
               d_x = 0 # straight line down, so no change in x
-              d_y = cfg["line_height"]
+              d_y = cfg["line_height"] - cfg["top_padding"]
 
               line = LineDraw(coord, d_x, d_y, cfg)
               acc_coord = line.draw_line(image)
+              # todo: add back the padding here (?))
 
             # now draw the subsequent text
             text = ' '.join([child.text for child in self.children])
@@ -134,6 +190,5 @@ class Node:
 
             right.draw_node(image, cfg, acc_coord_right,
                            width * (right.all_terminal_children_count) / self.all_terminal_children_count)
-
 
         return acc_coord # not sure this matters
