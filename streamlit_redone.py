@@ -45,7 +45,7 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse =
 
         if reparse: # this probably shouldn't go here?
             parse(cfg)
-        # gen_tree_image(cfg) # incorporate default somehow? by changing f probably
+
         gen_tree_image(cfg, f = cfg['default_file'] if default else cfg['output_file'])
         set_tree_container_if_not_exists()
         reload_tree(cfg, default)
@@ -55,46 +55,74 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse =
 
 
 
-st.write('sth')
-
-set_defaults_if_empty()
-initial_draw()
-
-
-with st.expander("Show current state"):
-    state_keys = [k for k in st.session_state]
-    state_keys.sort()
-    for k in state_keys:
-        st.write(f"{k} has value {st.session_state[k]} in st.session_state")
+def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
+    cfg[cfield] = st.slider(label = label,
+                    value = cfg[cfield],
+                    min_value = minv,
+                    max_value = maxv,
+                    step = step,
+                    format = format
+    )
 
 
+def show_configurations (cfg = st.session_state):
+    with st.expander("Show advanced options"):
+        slidewrap('W', 'Width of the whole image', 350, 3500)
+        slidewrap('H', 'Height of the whole image', 350, 3500)
+        slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2)
+        slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
 
-
-
-generate_tree = st.button("Generate this tree!")
-st.write(generate_tree)
-st.session_state['reload_tree?'] = generate_tree
-st.write(generate_tree)
-st.write(st.session_state['reload_tree?'])
-
-st.checkbox("this has no real function except to test page reloads :)")
-
-####
-# this is the big if
-# if it doesn't do as intended, forget it for now
-s = st.text_area(label = "this may do a thing?",
-                 value = st.session_state['sentence'])
-
-if s != '':
-    st.session_state['sentence'] = s
-
-
-# okay, I think this is a logical improvement!
-####
+def header ():
+    
+    st.write('sth')
 
 
 
 
+def homepage ():
+    set_defaults_if_empty()
+    initial_draw()
+
+    # with st.expander("Show current state"):
+    #     state_keys = [k for k in st.session_state]
+    #     state_keys.sort()
+    #     for k in state_keys:
+    #         st.write(f"{k} has value {st.session_state[k]} in st.session_state")
 
 
-redraw_tree_if_requested(reparse = True)
+    generate_tree = st.button("Generate this tree!")
+    # st.write(generate_tree)
+    st.session_state['reload_tree?'] = generate_tree
+    # st.write(generate_tree)
+    # st.write(st.session_state['reload_tree?'])
+    # st.checkbox("this has no real function except to test page reloads :)")
+
+    ####
+    # this is the big if
+    # if it doesn't do as intended, forget it for now
+    s = st.text_area(label = "this may do a thing?",
+                     value = st.session_state['sentence'])
+
+    if s != '':
+        st.session_state['sentence'] = s
+        #### 
+        
+        # ###                                                        ###
+        # try: also reload the tree whenever this changes!             #
+                                                                       
+        # st.session_state['reload_tree?'] = True                      #
+        # it doesn't quite do the trick:(                              #
+        # it made changes happen dynamically - which was cool - but it #
+        # only occured on every second change, which was weird         #
+        # ###                                                        ###
+
+
+
+    show_configurations()
+
+    # okay, I think this is a logical improvement!
+    ####
+    redraw_tree_if_requested(reparse = True)
+
+header()
+homepage()
