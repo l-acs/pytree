@@ -27,6 +27,10 @@ sample = """[IP
 sample_file = "default.png"
 outfile = "out.png"
 
+settings['sentence'] = sample
+settings['default_file'] = sample_file
+settings['output_file'] = outfile
+
 def create_tree (s): # this is the only one that SHOULDNT need cfg!
     pr = p.parse(s)
     tree = Convert(parse_results = pr).to_tree()
@@ -34,7 +38,7 @@ def create_tree (s): # this is the only one that SHOULDNT need cfg!
 
 
 def draw_tree (tree, cfg = settings):
-    print(f"This tree has {tree.all_terminal_children_count} terminal children")
+    # print(f"This tree has {tree.all_terminal_children_count} terminal children")
     i = fresh(cfg)
     tree.draw_node(i, cfg)
     return i

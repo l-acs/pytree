@@ -89,7 +89,7 @@ class Node:
             # try: take advantage of that sum thing
             # width is the x-axis movement left or right of the first node at which our tree branches
             full_image_width_sans_margin = cfg["drawable_width"]
-            print(f"The width the tree can fill is {full_image_width_sans_margin}")
+            # print(f"The width the tree can fill is {full_image_width_sans_margin}")
             width = full_image_width_sans_margin / 4
 
             # for a rainy day, consider this:
