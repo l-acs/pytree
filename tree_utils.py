@@ -30,6 +30,7 @@ outfile = "out.png"
 settings['sentence'] = sample
 settings['default_file'] = sample_file
 settings['output_file'] = outfile
+settings['reparse?'] = True
 
 def create_tree (s): # this is the only one that SHOULDNT need cfg!
     pr = p.parse(s)

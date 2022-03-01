@@ -71,39 +71,75 @@ def show_configurations (cfg = st.session_state):
         slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2)
         slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
 
-def header ():
-    st.write('sth')
+
+
+def textbox (old, cfg = st.session_state):
+    out = st.text_area(label = "this may do a thing?",
+                                                value = old)
+
+    if out and 'sentence' in cfg:
+        cfg['sentence'] = out
+        st.write("updating sent")
+    else:
+        st.write("not updating sent")
+
+    st.write(out)
+    return out
+    
+
+def tree_loop(cfg = st.session_state):
+    # separate this into two functions, one for text and one for other settings
+    # then it'll be easier to split the logic
+    
+    s_old = st.session_state['sentence']
+    out = textbox(s_old, st.session_state)
+
+    st.write(s_old)
+    st.write(st.session_state['sentence'])
+
+    generate_tree = st.button("Generate this tree!")
+    st.write(generate_tree)
+    st.write(st.session_state['sentence'])
+    
+
+    # something here must be redundant but I'm not sure what it is :(
+    if generate_tree or out: # st.session_state['sentence']:
+        st.session_state['reload_tree?'] = True
+        
+
+    show_configurations()
+    if out != s_old:
+        st.session_state['reload_tree?'] = True
+        out 
+        st.experimental_rerun()
+        redraw_tree_if_requested(reparse = st.session_state['reparse?'])
+        
+
+    if generate_tree or st.session_state['reload_tree?']:
+        redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
+
+    st.session_state['reload_tree?'] = False
+                
+    # so the issue is that we reload on any change, not just when the button is pressed
+
+
+
+
+def header (h = "pytree — Syntax Tree Generator"):
+    st.set_page_config(
+        page_title = h,
+    )
+
+    st.title("pytree")
+    st.header(h)
 
 
 def homepage ():
     set_defaults_if_empty()
-    initial_draw()
-
-    s = st.text_area(label = "this may do a thing?",
-                     value = st.session_state['sentence'])
-
-    generate_tree = st.button("Generate this tree!")
-
-
-    # conditions
-    nonempty = (s != '')
-    changed = (s != st.session_state['sentence'])
-
-
-    if nonempty:
-        reparse = True
-        if changed:
-            st.session_state['sentence'] = s
-
-    else:
-        reparse = False
-
-    # reload when the user presses the button or when they submit new text
-    st.session_state['reload_tree?'] = generate_tree or (nonempty and changed)
-
-
-    show_configurations()
-    redraw_tree_if_requested(reparse = reparse) # draw iff requested, but reparse only if the sentence has changed
+    # initial_draw()
+    # redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
+    
+    tree_loop()
 
 
 header()
