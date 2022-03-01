@@ -2,6 +2,7 @@ import streamlit as st
 import tree_utils as t
 from parse import Parse as p
 
+# @st.cache
 def set_defaults_if_empty (cfg = st.session_state, defaults = t.settings):
     for k in defaults:
         if k not in cfg:
@@ -77,7 +78,7 @@ def textbox (old, cfg = st.session_state):
     out = st.text_area(label = "this may do a thing?",
                                                 value = old)
 
-    if out and 'sentence' in cfg:
+    if out and 'sentence' in cfg and out != cfg['sentence']:
         cfg['sentence'] = out
         st.write("updating sent")
     else:
@@ -86,42 +87,6 @@ def textbox (old, cfg = st.session_state):
     st.write(out)
     return out
     
-
-def tree_loop(cfg = st.session_state):
-    # separate this into two functions, one for text and one for other settings
-    # then it'll be easier to split the logic
-    
-    s_old = st.session_state['sentence']
-    out = textbox(s_old, st.session_state)
-
-    st.write(s_old)
-    st.write(st.session_state['sentence'])
-
-    generate_tree = st.button("Generate this tree!")
-    st.write(generate_tree)
-    st.write(st.session_state['sentence'])
-    
-
-    # something here must be redundant but I'm not sure what it is :(
-    if generate_tree or out: # st.session_state['sentence']:
-        st.session_state['reload_tree?'] = True
-        
-
-    show_configurations()
-    if out != s_old:
-        st.session_state['reload_tree?'] = True
-        out 
-        st.experimental_rerun()
-        redraw_tree_if_requested(reparse = st.session_state['reparse?'])
-        
-
-    if generate_tree or st.session_state['reload_tree?']:
-        redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
-
-    st.session_state['reload_tree?'] = False
-                
-    # so the issue is that we reload on any change, not just when the button is pressed
-
 
 
 
@@ -138,9 +103,37 @@ def homepage ():
     set_defaults_if_empty()
     # initial_draw()
     # redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
+    s_old = st.session_state['sentence']
+    out = textbox(s_old, st.session_state)
+
+    st.write(s_old)
+    st.write(st.session_state['sentence'])
+
+    generate_tree = st.button("Generate this tree!")
+    st.write(generate_tree)
+    st.write(st.session_state['sentence'])
     
-    tree_loop()
+
+    # something here must be redundant but I'm not sure what it is :(
+    if generate_tree or st.session_state['sentence']:
+        st.session_state['reload_tree?'] = True
+        
+
+    show_configurations()
+    if out != s_old:
+        st.session_state['reload_tree?'] = True
+        st.experimental_rerun()
+        redraw_tree_if_requested(reparse = st.session_state['reparse?'])
+
+
+    if generate_tree or st.session_state['reload_tree?']:
+        redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
 
 
 header()
 homepage()
+
+
+
+# giving up for now
+# the reloading of value is pretty nondeterministic
