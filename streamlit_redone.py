@@ -54,7 +54,6 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse =
         st.write('not requested')
 
 
-
 def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
     cfg[cfield] = st.slider(label = label,
                     value = cfg[cfield],
@@ -73,39 +72,27 @@ def show_configurations (cfg = st.session_state):
         slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
 
 def header ():
-    
     st.write('sth')
-
-
 
 
 def homepage ():
     set_defaults_if_empty()
     initial_draw()
 
-    # with st.expander("Show current state"):
-    #     state_keys = [k for k in st.session_state]
-    #     state_keys.sort()
-    #     for k in state_keys:
-    #         st.write(f"{k} has value {st.session_state[k]} in st.session_state")
-
-
-    generate_tree = st.button("Generate this tree!")
-    # st.write(generate_tree)
-    st.session_state['reload_tree?'] = generate_tree
-    # st.write(generate_tree)
-    # st.write(st.session_state['reload_tree?'])
-    # st.checkbox("this has no real function except to test page reloads :)")
-
-    ####
-    # this is the big if
-    # if it doesn't do as intended, forget it for now
     s = st.text_area(label = "this may do a thing?",
                      value = st.session_state['sentence'])
 
+    generate_tree = st.button("Generate this tree!")
+    st.session_state['reload_tree?'] = generate_tree
+
     if s != '':
-        st.session_state['sentence'] = s
-        #### 
+        reparse = True
+        if s != st.session_state['sentence']:
+            st.session_state['sentence'] = s
+        
+        
+    else:
+        reparse = False
         
         # ###                                                        ###
         # try: also reload the tree whenever this changes!             #
@@ -117,12 +104,9 @@ def homepage ():
         # ###                                                        ###
 
 
-
     show_configurations()
+    redraw_tree_if_requested(reparse = reparse) # draw iff requested, but reparse only if the sentence has changed
 
-    # okay, I think this is a logical improvement!
-    ####
-    redraw_tree_if_requested(reparse = True)
 
 header()
 homepage()
