@@ -2,7 +2,6 @@ import streamlit as st
 import tree_utils as t
 from parse import Parse as p
 
-# @st.cache
 def set_defaults_if_empty (cfg = st.session_state, defaults = t.settings):
     for k in defaults:
         if k not in cfg:
@@ -42,7 +41,7 @@ def initial_draw (cfg = st.session_state, default = False):
 # todo: similarly for re-parsing
 def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse = False):
     if 'reload_tree?' in st.session_state and st.session_state['reload_tree?']:
-        st.write('requested')
+        # st.write('requested')
 
         if reparse: # this probably shouldn't go here?
             parse(cfg)
@@ -51,26 +50,38 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse =
         set_tree_container_if_not_exists()
         reload_tree(cfg, default)
         st.session_state['reload_tree?'] = False
-    else:
-        st.write('not requested')
+    # else:
+    #     st.write('not requested')
 
 
 def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
-    cfg[cfield] = st.slider(label = label,
-                    value = cfg[cfield],
+
+    prev = cfg[cfield]
+    out = st.slider(label = label,
+                    value = prev,
                     min_value = minv,
                     max_value = maxv,
                     step = step,
                     format = format
     )
 
+    if out and out != prev:
+        cfg[cfield] = out
+        st.experimental_rerun() # this is the key bit
+        return True
+    else:
+        return False
+    # st.write(cfg[cfield])
+
 
 def show_configurations (cfg = st.session_state):
     with st.expander("Show advanced options"):
-        slidewrap('W', 'Width of the whole image', 350, 3500)
-        slidewrap('H', 'Height of the whole image', 350, 3500)
-        slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2)
-        slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
+        width = slidewrap('W', 'Width of the whole image', 350, 3500)
+        height = slidewrap('H', 'Height of the whole image', 350, 3500)
+        top_pad = slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2)
+        bottom_pad = slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
+
+    return width or height or top_pad or bottom_pad
 
 
 
@@ -80,11 +91,11 @@ def textbox (old, cfg = st.session_state):
 
     if out and 'sentence' in cfg and out != cfg['sentence']:
         cfg['sentence'] = out
-        st.write("updating sent")
-    else:
-        st.write("not updating sent")
+        # st.write("updating sent")
+    # else:
+    #     st.write("not updating sent")
 
-    st.write(out)
+    # st.write(out)
     return out
     
 
@@ -101,39 +112,30 @@ def header (h = "pytree — Syntax Tree Generator"):
 
 def homepage ():
     set_defaults_if_empty()
-    # initial_draw()
-    # redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
+
     s_old = st.session_state['sentence']
     out = textbox(s_old, st.session_state)
+    # generate_tree = st.button("Generate this tree!")
+   
 
-    st.write(s_old)
-    st.write(st.session_state['sentence'])
-
-    generate_tree = st.button("Generate this tree!")
-    st.write(generate_tree)
-    st.write(st.session_state['sentence'])
-    
-
-    # something here must be redundant but I'm not sure what it is :(
-    if generate_tree or st.session_state['sentence']:
+    # if generate_tree or st.session_state['sentence']:
+    if st.session_state['sentence']:
         st.session_state['reload_tree?'] = True
         
 
-    show_configurations()
+    if show_configurations():
+        st.session_state['reload_tree?'] = True
+
     if out != s_old:
         st.session_state['reload_tree?'] = True
         st.experimental_rerun()
         redraw_tree_if_requested(reparse = st.session_state['reparse?'])
 
 
-    if generate_tree or st.session_state['reload_tree?']:
+    # if generate_tree or st.session_state['reload_tree?']:
+    if st.session_state['reload_tree?']:
         redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
 
 
 header()
 homepage()
-
-
-
-# giving up for now
-# the reloading of value is pretty nondeterministic
