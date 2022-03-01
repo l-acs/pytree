@@ -83,25 +83,23 @@ def homepage ():
                      value = st.session_state['sentence'])
 
     generate_tree = st.button("Generate this tree!")
-    st.session_state['reload_tree?'] = generate_tree
 
-    if s != '':
+
+    # conditions
+    nonempty = (s != '')
+    changed = (s != st.session_state['sentence'])
+
+
+    if nonempty:
         reparse = True
-        if s != st.session_state['sentence']:
+        if changed:
             st.session_state['sentence'] = s
-        
-        
+
     else:
         reparse = False
-        
-        # ###                                                        ###
-        # try: also reload the tree whenever this changes!             #
-                                                                       
-        # st.session_state['reload_tree?'] = True                      #
-        # it doesn't quite do the trick:(                              #
-        # it made changes happen dynamically - which was cool - but it #
-        # only occured on every second change, which was weird         #
-        # ###                                                        ###
+
+    # reload when the user presses the button or when they submit new text
+    st.session_state['reload_tree?'] = generate_tree or (nonempty and changed)
 
 
     show_configurations()
