@@ -24,12 +24,14 @@ sample = """[IP
         [I will]
         [VP [V be] [P here]]]]"""
 
+outdir = "out/"
 sample_file = "default.png"
 outfile = "out.png"
 
 settings['sentence'] = sample
 settings['default_file'] = sample_file
-settings['output_file'] = outfile
+settings['output_dir'] = outdir
+settings['output_file'] = outdir + outfile
 settings['reparse?'] = True
 
 def create_tree (s): # this is the only one that SHOULDNT need cfg!
