@@ -9,6 +9,16 @@ def set_defaults_if_empty (cfg = st.session_state, defaults = t.settings):
             cfg[k] = defaults[k]
     return cfg
 
+def reorder_insert_at_top(l, elem):
+    t = l.copy()
+    t.sort()
+
+    if elem in t:
+        t.remove(elem)
+
+    t.insert(0, elem)
+    return t
+
 
 def set_fonts_if_empty (cfg = st.session_state, loc = 'fonts/'):
     if 'fonts_avail' not in cfg:
@@ -81,7 +91,6 @@ def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = s
         return True
     else:
         return False
-    # st.write(cfg[cfield])
 
 
 def colorwrap(cfield, label, cfg = st.session_state):
@@ -116,11 +125,10 @@ def colorwrap_cols (tups, cfg = st.session_state):
 def dropdownwrap(cfield, label, options, cfg = st.session_state):
 
     prev = cfg[cfield]
-    out = st.selectbox(label, options)
 
-    # problem: the ordering of st.selectbox means that it gets reset to the first item in the list upon further changes
-    # idea: mutate options (sort it, make it unique, then insert the desired entry at the top?)
-    # lol
+    options_tweaked = reorder_insert_at_top(options, prev) # fixes [unwanted [font reset]] on update
+
+    out = st.selectbox(label, options_tweaked)
 
     if out and out != prev:
         cfg[cfield] = out
@@ -142,7 +150,7 @@ def show_configurations (cfg = st.session_state):
 
             slidewrap('font_size', 'Font size of text', 12, 44, step = 1, format = '%i pt'),
 
-            dropdownwrap('font_style', 'Font for text', cfg['fonts_avail']),
+            dropdownwrap('font_style', 'Text font', cfg['fonts_avail']),
 
             slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2),
             slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2),

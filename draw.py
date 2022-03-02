@@ -4,7 +4,7 @@ from pprint import pprint
 font_dir = "fonts/"
 
 settings = {
-    "font_style" : 'FreeMono',
+    "font_style" : 'Courier New',
     "font_size" : 22,
 
     "thickness" : 4,
