@@ -1,11 +1,21 @@
 import streamlit as st
 import tree_utils as t
 from parse import Parse as p
+import os
 
 def set_defaults_if_empty (cfg = st.session_state, defaults = t.settings):
     for k in defaults:
         if k not in cfg:
             cfg[k] = defaults[k]
+    return cfg
+
+
+def set_fonts_if_empty (cfg = st.session_state, loc = 'fonts/'):
+    if 'fonts_avail' not in cfg:
+        fonts = [font_file.split('.')[0] for font_file in os.listdir('fonts/')]
+        fonts.sort()
+        cfg['fonts_avail'] = fonts
+
     return cfg
 
 
@@ -74,20 +84,68 @@ def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = s
     # st.write(cfg[cfield])
 
 
+def colorwrap(cfield, label, cfg = st.session_state):
+
+    prev = cfg[cfield]
+    out = st.color_picker(label = label,
+                    value = prev
+    )
+
+    if out and out != prev:
+        cfg[cfield] = out
+        st.experimental_rerun() # this is the key bit
+        return True
+    else:
+        return False
+
+
+def dropdownwrap(cfield, label, options, cfg = st.session_state):
+
+    prev = cfg[cfield]
+    out = st.selectbox(label, options)
+
+    # problem: the ordering of st.selectbox means that it gets reset to the first item in the list upon further changes
+    # idea: mutate options (sort it, make it unique, then insert the desired entry at the top?)
+    # lol
+
+    if out and out != prev:
+        cfg[cfield] = out
+        st.experimental_rerun() # this is the key bit
+        return True
+    else:
+        return False
+
+
+
 def show_configurations (cfg = st.session_state):
     with st.expander("Show advanced options"):
-        width = slidewrap('W', 'Width of the whole image', 350, 3500)
-        height = slidewrap('H', 'Height of the whole image', 350, 3500)
-        top_pad = slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2)
-        bottom_pad = slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2)
+        l = [
+            slidewrap('W', 'Width of the whole image', 350, 3500),
+            slidewrap('H', 'Height of the whole image', 350, 3500),
 
-    return width or height or top_pad or bottom_pad
+            slidewrap('font_size', 'Font size of text', 12, 44, step = 1, format = '%i pt'),
 
+            dropdownwrap('font_style', 'Font for text', cfg['fonts_avail']),
+
+            slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2),
+            slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2),
+            colorwrap("fg_color", 'Foreground color:'), # maybe: use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider
+            colorwrap("bg_color", 'Background color:'), # maybe: use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider
+
+            slidewrap('margin', 'Margins around the tree', 0, 125)
+        ]
+
+    for config in l: # if any of these have returned a truthy value, i.e. slidewrap has determined a change has been made,
+        if config:
+            return config # then show_configurations should return that truth value to tell the app to redraw the tree
+
+    return False
 
 
 def textbox (old, cfg = st.session_state):
-    out = st.text_area(label = "this may do a thing?",
-                                                value = old)
+    out = st.text_area(label = "Enter your tree here",
+                       value = old,
+                       height = len(st.session_state['sentence'].splitlines()) * 20)
 
     if out and 'sentence' in cfg and out != cfg['sentence']:
         cfg['sentence'] = out
@@ -101,17 +159,18 @@ def textbox (old, cfg = st.session_state):
 
 
 
-def header (h = "pytree — Syntax Tree Generator"):
+def header (name = 'pytree', subtitle = 'Syntax Tree Generator'):
     st.set_page_config(
-        page_title = h,
+        page_title = subtitle
     )
 
-    st.title("pytree")
-    st.header(h)
+    st.title(name)
+    st.header(f'{name}  —  {subtitle}')
 
 
 def homepage ():
     set_defaults_if_empty()
+    set_fonts_if_empty()
 
     s_old = st.session_state['sentence']
     out = textbox(s_old, st.session_state)

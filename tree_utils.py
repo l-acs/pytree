@@ -9,7 +9,7 @@ import os
 
 
 def fresh(cfg = settings): # get new image w/ default size etc
-    return Image.new("RGBA",(cfg["W"], cfg["H"]),"white") # random
+    return Image.new("RGBA",(cfg["W"], cfg["H"]), cfg["bg_color"]) # random
 
 
 # image = fresh()

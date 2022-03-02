@@ -93,7 +93,7 @@ with st.expander("Show advanced features"):
     config["font_style"] = tree_gen_form.selectbox('Select a font:', fonts)
 
     config["font_size"] = int(4 * tree_gen_form.number_input('Choose font size:', min_value=8, max_value=40, value = 20))
-    config["line_color"] = tree_gen_form.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
+    config["fg_color"] = tree_gen_form.color_picker('Pick line and text color:', "#42A6D0") # use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider)
 
     config["thickness"] = tree_gen_form.slider('Thickness of lines:', 0, 15, t.settings["thickness"])
 

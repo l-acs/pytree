@@ -5,16 +5,18 @@ font_dir = "fonts/"
 
 settings = {
     "font_style" : 'FreeMono',
-    "font_size" : 80,
-    "line_color" : '#000000',
+    "font_size" : 22,
+
     "thickness" : 4,
+    "fg_color" : '#000000',
+    "bg_color" : '#ffffff',
 
     "margin" : 20,
     "top_padding" : 10, # between a parent node and its branch(es)
     "bottom_padding" : 20, # between a branch and the child
 
-    "W" : 3500, # whole image's width
-    "H" : 2500, # whole image's height
+    "W" : 2500, # whole image's width
+    "H" : 1700, # whole image's height
     "font_max_height_in_pixels" : None, # this is for internal use; it gets set in node.py
     "font_typical_word_width_in_pixels" : None # likewise
 }
@@ -31,7 +33,7 @@ class TextDraw:
         i = Image.new("RGBA",(cfg["W"], cfg["H"]),"white")
         d = ImageDraw.Draw(i)
 
-        self.font = ImageFont.truetype(font_dir + self.cfg["font_style"] + '.ttf', self.cfg["font_size"])
+        self.font = ImageFont.truetype(font_dir + self.cfg["font_style"] + '.ttf', self.cfg["font_size"] * 3)
         (w, h) = d.textsize(text, font = self.font)
 
         self.size = (w, h)
@@ -63,7 +65,7 @@ class TextDraw:
         d.text(top_left,
                self.text,
                font = self.font,
-               fill = ImageColor.getrgb(self.cfg["line_color"]))
+               fill = ImageColor.getrgb(self.cfg["fg_color"]))
 
 
         return self.get_coord_below(coord)
@@ -106,7 +108,7 @@ class LineDraw:
         d = ImageDraw.Draw(image)
 
         d.line([self.top_point, self.bottom_point],
-               fill = ImageColor.getrgb(self.cfg["line_color"]),
+               fill = ImageColor.getrgb(self.cfg["fg_color"]),
                width = self.cfg["thickness"])
 
         return self.bottom_point
@@ -115,7 +117,7 @@ class LineDraw:
 
     def draw_triangle (self, image):
         d = ImageDraw.Draw(image)
-        fill_color = ImageColor.getrgb(self.cfg["line_color"])
+        fill_color = ImageColor.getrgb(self.cfg["fg_color"])
         thickness = self.cfg["thickness"]
 
         d.line([self.top_point, self.bottom_point], fill_color, width = thickness)
