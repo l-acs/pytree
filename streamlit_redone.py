@@ -98,6 +98,20 @@ def colorwrap(cfield, label, cfg = st.session_state):
     else:
         return False
 
+def colorwrap_cols (tups, cfg = st.session_state):
+    cols = st.columns(len(tups))
+    new_selection = False
+
+    for pairing in tups:
+        (cfield, label) = pairing
+        col = cols.pop()
+        with col:
+            new_selection = new_selection or colorwrap(cfield, label, cfg)
+
+    return new_selection
+
+
+
 
 def dropdownwrap(cfield, label, options, cfg = st.session_state):
 
@@ -118,6 +132,9 @@ def dropdownwrap(cfield, label, options, cfg = st.session_state):
 
 
 def show_configurations (cfg = st.session_state):
+    color_tups = [("fg_color", 'Foreground color'),
+                  ("bg_color", 'Background color')]
+
     with st.expander("Show advanced options"):
         l = [
             slidewrap('W', 'Width of the whole image', 350, 3500),
@@ -129,8 +146,7 @@ def show_configurations (cfg = st.session_state):
 
             slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2),
             slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2),
-            colorwrap("fg_color", 'Foreground color:'), # maybe: use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider
-            colorwrap("bg_color", 'Background color:'), # maybe: use something other than the actual default to be more illustrative; otherwise it (seems like it) stays black as you move the slider
+            colorwrap_cols(color_tups),
 
             slidewrap('margin', 'Margins around the tree', 0, 125)
         ]
