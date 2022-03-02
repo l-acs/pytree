@@ -173,19 +173,22 @@ def textbox (old, cfg = st.session_state):
 
     if out and 'sentence' in cfg and out != cfg['sentence']:
         cfg['sentence'] = out
-        # st.write("updating sent")
-    # else:
-    #     st.write("not updating sent")
 
-    # st.write(out)
     return out
     
 
 
 
-def header (name = 'pytree', subtitle = 'Syntax Tree Generator'):
+def header (name, subtitle, author = '🥷', git_url = 'github.com'):
     st.set_page_config(
-        page_title = subtitle
+        page_title = subtitle,
+        page_icon = '🌳',
+        menu_items= {
+            'About': f'# {name}\nA linguistic {subtitle.lower()} by {author}',
+            'Get Help': f'https://{git_url}/{author}/{name}/issues', # this is stupid but fun
+            'Report a bug': None
+        },
+
     )
 
     st.title(name)
@@ -196,29 +199,24 @@ def homepage ():
     set_defaults_if_empty()
     set_fonts_if_empty()
 
-    s_old = st.session_state['sentence']
-    out = textbox(s_old, st.session_state)
-    # generate_tree = st.button("Generate this tree!")
-   
+    previous_text = st.session_state['sentence']
+    new_text = textbox(previous_text, st.session_state)
 
-    # if generate_tree or st.session_state['sentence']:
     if st.session_state['sentence']:
         st.session_state['reload_tree?'] = True
         
-
     if show_configurations():
         st.session_state['reload_tree?'] = True
 
-    if out != s_old:
+    if new_text != previous_text:
         st.session_state['reload_tree?'] = True
         st.experimental_rerun()
         redraw_tree_if_requested(reparse = st.session_state['reparse?'])
 
 
-    # if generate_tree or st.session_state['reload_tree?']:
     if st.session_state['reload_tree?']:
         redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
 
 
-header()
+header('pytree', 'Syntax Tree Generator', 'l-acs')
 homepage()
