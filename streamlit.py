@@ -107,19 +107,44 @@ def colorwrap(cfield, label, cfg = st.session_state):
     else:
         return False
 
-def colorwrap_cols (tups, cfg = st.session_state):
-    cols = st.columns(len(tups))
-    new_selection = False
+def buttonswap(cfield1, cfield2, label, cfg = st.session_state):
+    buttonswap_state = f'{cfield1}_{cfield2}_buttonswap' # unique id for this swap button
+    if buttonswap_state not in cfg:
+        cfg[buttonswap_state] = False
 
-    for pairing in tups:
-        (cfield, label) = pairing
-        col = cols.pop()
-        with col:
-            new_selection = new_selection or colorwrap(cfield, label, cfg)
+    if cfg[buttonswap_state]:
+        return True
+
+    cfg[buttonswap_state] = st.button(label = label)
+
+    if cfg[buttonswap_state]:
+        tmp = cfg[cfield1]
+        cfg[cfield1] = cfg[cfield2]
+        cfg[cfield2] = tmp
+        cfg[buttonswap_state] = False
+        st.experimental_rerun() # this is the key bit
+        return True
+
+    else:
+        return False
+
+
+
+def colorwrap_cols (fg_field = 'fg_color', bg_field = 'bg_color', cfg = st.session_state):
+    new_selection = False
+    swap_col, fg_col, bg_col = st.columns([10, 1, 4])
+
+    with fg_col:
+        new_selection = new_selection or colorwrap(fg_field, '', cfg)
+
+    with bg_col:
+        new_selection = new_selection or colorwrap(bg_field, '', cfg)
+
+    with swap_col:
+        st.caption("Select colors")
+        new_selection = new_selection or buttonswap(fg_field, bg_field, 'Swap tree colors', cfg)
 
     return new_selection
-
-
 
 
 def dropdownwrap(cfield, label, options, cfg = st.session_state):
@@ -140,8 +165,6 @@ def dropdownwrap(cfield, label, options, cfg = st.session_state):
 
 
 def show_configurations (cfg = st.session_state):
-    color_tups = [("fg_color", 'Foreground color'),
-                  ("bg_color", 'Background color')]
 
     with st.expander("Show advanced options"):
         l = [
@@ -154,7 +177,7 @@ def show_configurations (cfg = st.session_state):
 
             slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2),
             slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2),
-            colorwrap_cols(color_tups),
+            colorwrap_cols('fg_color', 'bg_color', cfg),
 
             slidewrap('margin', 'Margins around the tree', 0, 125)
         ]
