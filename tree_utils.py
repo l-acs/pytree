@@ -1,3 +1,4 @@
+import re
 from parse import Parse as p
 from convert import Convert
 
@@ -33,6 +34,11 @@ settings['default_file'] = sample_file
 settings['output_dir'] = outdir
 settings['output_file'] = outdir + outfile
 settings['reparse?'] = True
+
+blank_regexp = re.compile(r'\s+')
+
+def sanity_check (sentence):
+    return (sentence and blank_regexp.sub('', sentence) != '')
 
 def create_tree (s): # this is the only one that SHOULDNT need cfg!
     pr = p.parse(s)

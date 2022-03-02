@@ -37,9 +37,16 @@ def set_tree_container_if_not_exists ():
 def parse (cfg = st.session_state):
     try:
         if 'sentence' in cfg:
-            cfg['tree'] = t.create_tree(cfg['sentence'])
+            s = cfg['sentence']
+
+            if t.sanity_check(s):
+                cfg['tree'] = t.create_tree(s)
+                return True
+
     except p.ParseError:
         st.warning("It looks like that's not a valid tree! Please edit your text and try again.")
+
+    return False
 
 
 def gen_tree_image (cfg = st.session_state, f = None):
@@ -60,18 +67,17 @@ def initial_draw (cfg = st.session_state, default = False):
 
 # todo: similarly for re-parsing
 def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse = False):
-    if 'reload_tree?' in st.session_state and st.session_state['reload_tree?']:
-        # st.write('requested')
+    if 'reload_tree?' in cfg and cfg['reload_tree?']:
 
-        if reparse: # this probably shouldn't go here?
-            parse(cfg)
+        if reparse and cfg['sentence']:
+            p = parse(cfg)
+            if not (p): # failed parse
+                return # exit
 
         gen_tree_image(cfg, f = cfg['default_file'] if default else cfg['output_file'])
         set_tree_container_if_not_exists()
         reload_tree(cfg, default)
         st.session_state['reload_tree?'] = False
-    # else:
-    #     st.write('not requested')
 
 
 def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
@@ -182,9 +188,9 @@ def show_configurations (cfg = st.session_state):
             slidewrap('margin', 'Margins around the tree', 0, 125)
         ]
 
-    for config in l: # if any of these have returned a truthy value, i.e. slidewrap has determined a change has been made,
-        if config:
-            return config # then show_configurations should return that truth value to tell the app to redraw the tree
+    for config in l: # if slidewrap etc has determined a change has been made,
+        if config: # i.e. if any of these have returned a truthy value,
+            return config # then show_configurations should return that truthy value to tell the app to redraw the tree
 
     return False
 
@@ -192,14 +198,17 @@ def show_configurations (cfg = st.session_state):
 def textbox (old, cfg = st.session_state):
     out = st.text_area(label = "Enter your tree here",
                        value = old,
-                       height = len(st.session_state['sentence'].splitlines()) * 20)
+                       height = len(cfg['sentence'].splitlines()) * 20)
 
     if out and 'sentence' in cfg and out != cfg['sentence']:
         cfg['sentence'] = out
 
-    return out
+    if (out != ''):
+        return out
 
-
+    else:
+        cfg['sentence'] = '\n'
+        return '\n'
 
 
 def header (name, subtitle, author = '🥷', git_url = 'github.com'):
