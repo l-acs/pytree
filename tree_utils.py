@@ -8,11 +8,6 @@ import streamlit as st
 from PIL import Image
 import os
 
-
-def fresh(cfg = settings): # get new image w/ default size etc
-    return Image.new("RGBA",(cfg["W"], cfg["H"]), cfg["bg_color"])
-
-
 sample = """[IP
    [NP 
         [DP [D the] [D 30]]
@@ -31,13 +26,17 @@ settings['sentence'] = sample
 settings['default_file'] = sample_file
 settings['output_dir'] = outdir
 settings['output_file'] = outdir + outfile
-settings['reparse?'] = True
 
 blank_regexp = re.compile(r'\s+')
 
 @st.experimental_memo(persist="disk") # probably overkill
 def sanity_check (sentence):
     return (sentence and blank_regexp.sub('', sentence) != '')
+
+@st.experimental_memo(persist="disk")
+def fresh (width, height, bg_color):
+    return Image.new("RGBA", (width, height), bg_color)
+
 
 @st.experimental_memo(persist="disk")
 def create_tree (s):
@@ -47,7 +46,7 @@ def create_tree (s):
     return tree
 
 def draw_tree (tree, cfg = settings):
-    i = fresh(cfg)
+    i = fresh(cfg['W'], cfg['H'], cfg['bg_color'])
     tree.draw_node(i, cfg)
     return i
 

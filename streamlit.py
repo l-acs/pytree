@@ -76,38 +76,35 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False):
         st.session_state['reload_tree?'] = False
 
 
-def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
+def inform_of_reload (field, widget_field, cfg = st.session_state): # callback for widget changes
+    cfg['reload_tree?'] = True
+    cfg[field] = cfg[widget_field]
 
+
+def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
+    slider_name = cfield + '_slider'
     prev = cfg[cfield]
     out = st.slider(label = label,
                     value = prev,
                     min_value = minv,
                     max_value = maxv,
                     step = step,
-                    format = format
+                    format = format,
+                    key = slider_name, # this will make it accessible in state
+                    on_change = inform_of_reload,
+                    args = (cfield, slider_name, cfg)
     )
-
-    if out and out != prev:
-        cfg[cfield] = out
-        st.experimental_rerun() # this is the key bit
-        return True
-    else:
-        return False
-
 
 def colorwrap(cfield, label, cfg = st.session_state):
-
+    picker_name = cfield + '_picker'
     prev = cfg[cfield]
     out = st.color_picker(label = label,
-                    value = prev
+                          value = prev,
+                          key = picker_name, # this will make it accessible in state
+                          on_change = inform_of_reload,
+                          args = (cfield, picker_name, cfg)
     )
 
-    if out and out != prev:
-        cfg[cfield] = out
-        st.experimental_rerun() # this is the key bit
-        return True
-    else:
-        return False
 
 def buttonswap(cfield1, cfield2, label, cfg = st.session_state):
     buttonswap_state = f'{cfield1}_{cfield2}_buttonswap' # unique id for this swap button
@@ -119,7 +116,7 @@ def buttonswap(cfield1, cfield2, label, cfg = st.session_state):
 
     cfg[buttonswap_state] = st.button(label = label)
 
-    if cfg[buttonswap_state]:
+    if cfg[buttonswap_state]: # this might start to fail given callback paradigm
         tmp = cfg[cfield1]
         cfg[cfield1] = cfg[cfield2]
         cfg[cfield2] = tmp
@@ -238,11 +235,8 @@ def homepage ():
     if new_text != previous_text:
         st.session_state['reload_tree?'] = True
         st.experimental_rerun()
-        redraw_tree_if_requested()
 
-
-    if st.session_state['reload_tree?']:
-        redraw_tree_if_requested()
+    redraw_tree_if_requested()
 
 
 header('pytree', 'Syntax Tree Generator', 'l-acs')
