@@ -80,6 +80,11 @@ def inform_of_reload (field, widget_field, cfg = st.session_state): # callback f
     cfg['reload_tree?'] = True
     cfg[field] = cfg[widget_field]
 
+def swap_and_inform_of_reload (cfield1, cfield2, cfg = st.session_state):
+    tmp = cfg[cfield1]
+    cfg[cfield1] = cfg[cfield2]
+    cfg[cfield2] = tmp
+    cfg['reload_tree?'] = True
 
 def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = st.session_state):
     slider_name = cfield + '_slider'
@@ -107,27 +112,13 @@ def colorwrap(cfield, label, cfg = st.session_state):
 
 
 def buttonswap(cfield1, cfield2, label, cfg = st.session_state):
-    buttonswap_state = f'{cfield1}_{cfield2}_buttonswap' # unique id for this swap button
-    if buttonswap_state not in cfg:
-        cfg[buttonswap_state] = False
+    button_name = f'{cfield1}_{cfield2}_buttonswap' # unique id for this swap button
 
-    if cfg[buttonswap_state]:
-        return True
-
-    cfg[buttonswap_state] = st.button(label = label)
-
-    if cfg[buttonswap_state]: # this might start to fail given callback paradigm
-        tmp = cfg[cfield1]
-        cfg[cfield1] = cfg[cfield2]
-        cfg[cfield2] = tmp
-        cfg[buttonswap_state] = False
-        st.experimental_rerun() # this is the key bit
-        return True
-
-    else:
-        return False
-
-
+    out = st.button (label = label,
+                     key = button_name,
+                     on_click = swap_and_inform_of_reload,
+                     args = (cfield1, cfield2, cfg)
+    )
 
 def colorwrap_cols (fg_field = 'fg_color', bg_field = 'bg_color', cfg = st.session_state):
     new_selection = False
@@ -163,7 +154,6 @@ def dropdownwrap(cfield, label, options, cfg = st.session_state):
 
 
 def show_configurations (cfg = st.session_state):
-
     with st.expander("Show advanced options"):
         l = [
             slidewrap('W', 'Full image width', 350, 3500),
@@ -179,12 +169,6 @@ def show_configurations (cfg = st.session_state):
 
             slidewrap('margin', 'Margins around the tree', 0, 125)
         ]
-
-    for config in l: # if slidewrap etc has determined a change has been made,
-        if config: # i.e. if any of these have returned a truthy value,
-            return config # then show_configurations should return that truthy value to tell the app to redraw the tree
-
-    return False
 
 
 def textbox (old, cfg = st.session_state):
@@ -229,8 +213,7 @@ def homepage ():
     if st.session_state['sentence']: # is this useful?
         st.session_state['reload_tree?'] = True
 
-    if show_configurations():
-        st.session_state['reload_tree?'] = True
+    show_configurations()
 
     if new_text != previous_text:
         st.session_state['reload_tree?'] = True
