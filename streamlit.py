@@ -36,18 +36,15 @@ def set_tree_container_if_not_exists ():
 
 def parse (cfg = st.session_state):
     try:
-        if 'sentence' in cfg:
-            s = cfg['sentence']
-
-            if t.sanity_check(s):
-                cfg['tree'] = t.create_tree(s)
-                return True
+        s = cfg['sentence']
+        if t.sanity_check(s):
+            cfg['tree'] = t.create_tree(s)
+            return True
 
     except p.ParseError:
         st.warning("It looks like that's not a valid tree! Please edit your text and try again.")
 
     return False
-
 
 def gen_tree_image (cfg = st.session_state, f = None):
     if f is None:
@@ -65,11 +62,10 @@ def initial_draw (cfg = st.session_state, default = False):
         reload_tree(cfg, default)
 
 
-# todo: similarly for re-parsing
-def redraw_tree_if_requested (cfg = st.session_state, default = False, reparse = False):
+def redraw_tree_if_requested (cfg = st.session_state, default = False):
     if 'reload_tree?' in cfg and cfg['reload_tree?']:
 
-        if reparse and cfg['sentence']:
+        if 'sentence' in cfg and cfg['sentence']:
             p = parse(cfg)
             if not (p): # failed parse
                 return # exit
@@ -154,9 +150,7 @@ def colorwrap_cols (fg_field = 'fg_color', bg_field = 'bg_color', cfg = st.sessi
 
 
 def dropdownwrap(cfield, label, options, cfg = st.session_state):
-
     prev = cfg[cfield]
-
     options_tweaked = reorder_insert_at_top(options, prev) # fixes [unwanted [font reset]] on update
 
     out = st.selectbox(label, options_tweaked)
@@ -165,6 +159,7 @@ def dropdownwrap(cfield, label, options, cfg = st.session_state):
         cfg[cfield] = out
         st.experimental_rerun() # this is the key bit
         return True
+
     else:
         return False
 
@@ -234,7 +229,7 @@ def homepage ():
     previous_text = st.session_state['sentence']
     new_text = textbox(previous_text, st.session_state)
 
-    if st.session_state['sentence']:
+    if st.session_state['sentence']: # is this useful?
         st.session_state['reload_tree?'] = True
 
     if show_configurations():
@@ -243,11 +238,11 @@ def homepage ():
     if new_text != previous_text:
         st.session_state['reload_tree?'] = True
         st.experimental_rerun()
-        redraw_tree_if_requested(reparse = st.session_state['reparse?'])
+        redraw_tree_if_requested()
 
 
     if st.session_state['reload_tree?']:
-        redraw_tree_if_requested(reparse = st.session_state['reparse?']) # draw iff requested, but reparse only if the sentence has changed
+        redraw_tree_if_requested()
 
 
 header('pytree', 'Syntax Tree Generator', 'l-acs')
