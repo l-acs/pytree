@@ -169,15 +169,15 @@ def show_configurations (cfg = st.session_state):
 
     with st.expander("Show advanced options"):
         l = [
-            slidewrap('W', 'Width of the whole image', 350, 3500),
-            slidewrap('H', 'Height of the whole image', 350, 3500),
+            slidewrap('W', 'Full image width', 350, 3500),
+            slidewrap('H', 'Full image height', 350, 3500),
 
-            slidewrap('font_size', 'Font size of text', 12, 44, step = 1, format = '%i pt'),
+            slidewrap('font_size', 'Font size', 12, 44, step = 1, format = '%i pt'),
 
             dropdownwrap('font_style', 'Text font', cfg['fonts_avail']),
 
-            slidewrap('top_padding', 'Top padding between node and branches', 4, 40, step = 2),
-            slidewrap('bottom_padding', 'Bottom padding between branches and nodes', 4, 40, step = 2),
+            slidewrap('bottom_padding', 'Padding above nodes (after branched to)', 4, 40, step = 2),
+            slidewrap('top_padding', 'Padding below nodes', 4, 40, step = 2),
             colorwrap_cols('fg_color', 'bg_color', cfg),
 
             slidewrap('margin', 'Margins around the tree', 0, 125)
