@@ -7,17 +7,6 @@ def set_defaults_if_empty (cfg = st.session_state, defaults = t.settings):
     for k in defaults:
         if k not in cfg:
             cfg[k] = defaults[k]
-    return cfg
-
-def reorder_insert_at_top(l, elem):
-    t = l.copy()
-    t.sort()
-
-    if elem in t:
-        t.remove(elem)
-
-    t.insert(0, elem)
-    return t
 
 
 def set_fonts_if_empty (cfg = st.session_state, loc = 'fonts/'):
@@ -25,8 +14,6 @@ def set_fonts_if_empty (cfg = st.session_state, loc = 'fonts/'):
         fonts = [font_file.split('.')[0] for font_file in os.listdir('fonts/')]
         fonts.sort()
         cfg['fonts_avail'] = fonts
-
-    return cfg
 
 
 def set_tree_container_if_not_exists (cfg = st.session_state):
@@ -71,9 +58,9 @@ def redraw_tree_if_requested (cfg = st.session_state, default = False):
         cfg['reload_tree?'] = False
 
 
-def inform_of_reload (field, widget_field, cfg = st.session_state): # callback for widget changes
+def inform_of_reload (field, widget_field, cfg = st.session_state, check = lambda x: True, fallback = True): # callback for widget changes
     cfg['reload_tree?'] = True
-    cfg[field] = cfg[widget_field]
+    cfg[field] = cfg[widget_field] if check(cfg[widget_field]) else fallback
 
 def swap_and_inform_of_reload (cfield1, cfield2, cfg = st.session_state):
     tmp = cfg[cfield1]
@@ -91,8 +78,8 @@ def slidewrap(cfield, label, minv, maxv, step = 5, format = '%i pixels', cfg = s
               format = format,
               key = slider_name, # this will make it accessible in state
               on_change = inform_of_reload,
-              args = (cfield, slider_name, cfg)
-    )
+              args = (cfield, slider_name, cfg))
+
 
 def colorwrap(cfield, label, cfg = st.session_state):
     picker_name = cfield + '_picker'
@@ -100,47 +87,45 @@ def colorwrap(cfield, label, cfg = st.session_state):
                     value = cfg[cfield], # previous value
                     key = picker_name, # this will make it accessible in state
                     on_change = inform_of_reload,
-                    args = (cfield, picker_name, cfg)
-    )
+                    args = (cfield, picker_name, cfg))
 
 
 def buttonswap(cfield1, cfield2, label, cfg = st.session_state):
     button_name = f'{cfield1}_{cfield2}_buttonswap' # unique id for this swap button
 
-    out = st.button (label = label,
-                     key = button_name,
-                     on_click = swap_and_inform_of_reload,
-                     args = (cfield1, cfield2, cfg)
-    )
+    st.button(label = label,
+              key = button_name,
+              on_click = swap_and_inform_of_reload,
+              args = (cfield1, cfield2, cfg))
+
 
 def colorwrap_cols (fg_field = 'fg_color', bg_field = 'bg_color', cfg = st.session_state):
-    # new_selection = False
     swap_col, fg_col, bg_col = st.columns([10, 1, 4])
 
     with fg_col:
-        # new_selection = new_selection or
         colorwrap(fg_field, '', cfg)
 
     with bg_col:
-        # new_selection = new_selection or
         colorwrap(bg_field, '', cfg)
 
     with swap_col:
         st.caption("Select colors")
-        # new_selection = new_selection or
         buttonswap(fg_field, bg_field, 'Swap tree colors', cfg)
-
-    # return new_selection
 
 
 def dropdownwrap(cfield, label, options, cfg = st.session_state):
+    # seems like this occasionally returns some garbage and doesn't
+    # reload the tree?? but only rarely. Can't figure out how to
+    # consistently reproduce. Hmm
+
     prev = cfg[cfield]
-    options_tweaked = reorder_insert_at_top(options, prev) # fixes [unwanted [font reset]] on update
+    options_tweaked = t.reorder_insert_at_top(options, prev) # fixes [unwanted [font reset]] on update
 
     out = st.selectbox(label, options_tweaked)
 
     if out and out != prev:
         cfg[cfield] = out
+        cfg['reload_tree?'] = True
         st.experimental_rerun() # this is the key bit
         return True
 
@@ -148,9 +133,8 @@ def dropdownwrap(cfield, label, options, cfg = st.session_state):
         return False
 
 
-
 def show_configurations (cfg = st.session_state):
-    with st.expander("Show advanced options"):
+    with st.expander("Show advanced options"): # possible bug: first change closes the expander
         slidewrap('W', 'Full image width', 350, 3500)
         slidewrap('H', 'Full image height', 350, 3500)
 
@@ -164,21 +148,16 @@ def show_configurations (cfg = st.session_state):
         slidewrap('margin', 'Margins around the tree', 0, 125)
 
 
-
-def textbox (old, cfg = st.session_state):
-    out = st.text_area(label = "Enter your tree here",
-                       value = old,
-                       height = len(cfg['sentence'].splitlines()) * 20)
-
-    if out and 'sentence' in cfg and out != cfg['sentence']:
-        cfg['sentence'] = out
-
-    if (out != ''):
-        return out
-
-    else:
-        cfg['sentence'] = '\n'
-        return '\n'
+def textbox (cfield, cfg = st.session_state):
+    area_name = cfield + '_textbox'
+    old = cfg[cfield]
+    st.text_area(label = "Enter your tree here",
+                 value = old,
+                 height = len(old.splitlines()) * 20,
+                 key = area_name,
+                 on_change = inform_of_reload,
+                 args = (cfield, area_name, cfg),
+                 kwargs = {'check': t.sanity_check, 'fallback': '\n'})
 
 
 def header (name, subtitle, author = '🥷', git_url = 'github.com'):
@@ -190,7 +169,6 @@ def header (name, subtitle, author = '🥷', git_url = 'github.com'):
             'Get Help': f'https://{git_url}/{author}/{name}/issues', # this is stupid but fun
             'Report a bug': None
         },
-
     )
 
     st.title(name)
@@ -201,18 +179,8 @@ def homepage (cfg = st.session_state):
     set_defaults_if_empty()
     set_fonts_if_empty()
 
-    previous_text = cfg['sentence']
-    new_text = textbox(previous_text, cfg)
-
-    if cfg['sentence']: # for now, this is needed to (a) generate the tree on first run and (b) redraw on font change
-        cfg['reload_tree?'] = True
-
+    textbox('sentence', cfg)
     show_configurations()
-
-    if new_text != previous_text:
-        cfg['reload_tree?'] = True
-        st.experimental_rerun()
-
     redraw_tree_if_requested()
 
 

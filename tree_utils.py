@@ -26,8 +26,19 @@ settings['sentence'] = sample
 settings['default_file'] = sample_file
 settings['output_dir'] = outdir
 settings['output_file'] = outdir + outfile
+settings['reload_tree?'] = True # true for the first run!
 
 blank_regexp = re.compile(r'\s+')
+
+def reorder_insert_at_top(l, elem): # for fonts
+    t = l.copy()
+    t.sort()
+
+    if elem in t:
+        t.remove(elem)
+
+    t.insert(0, elem)
+    return t
 
 @st.experimental_memo(persist="disk") # probably overkill
 def sanity_check (sentence):
