@@ -15,7 +15,8 @@ class Parse:
     LANGLE, RANGLE, LBRACK, RBRACK = map(pp.Suppress, delims)
 
 
-    label = pp.Word(pp.printables, exclude_chars=delims) # formerly jsonString
+    label = pp.Word(pp.unicode.printables, exclude_chars=delims) # formerly jsonString
+
 
     tree = pp.Forward().setName("tree") # formerly jsonObject
     node = pp.Forward().setName("node") # formerly jsonValue
@@ -57,26 +58,24 @@ class Parse:
 
 
 if __name__ == "__main__":
-# def __main__ ():
+
     testdata = """
     [Here is]
     """
+    results = Parse.parse(testdata)
 
-    results = tree.parseString(testdata)
-
-    
     sample = "[NP [D the] [N' <AdjP very big> [N dog]]]"
 
     print(
-        parse("[NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]]"))
+        Parse.parse("[NP [DP [D əthæae] [D 3ɳ0]] [N' [AdjP vɚ e̩ry big] [N dogs]]]"))
 
     print(
-        parse("[NP [DP [D the] [D 30]] [N' [AdjP <AdvP very very very> [A big]] [N dogs]]]"))
+        Parse.parse("[NP [DP [D the] [D 30]] [N' [AdjP <AdvP very əvery very> [A big]] [N dogs]]]"))
 
     print(
-        parse("[]"))
+        Parse.parse("[]"))
 
 
     print(
-        parse("[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will] [VP [V be] [P here]]]]")
+        Parse.parse("[IP [NP [DP [D the] [D 30]] [N' [AdjP very big] [N dogs]]] [I' [I will] [VP [V be] [P here]]]]")
     )
